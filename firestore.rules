@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Пользователи
+    match /users/{userId} {
+      allow read: if isAuth() && request.auth.uid == userId;
+      allow create: if request.auth.uid == userId
+        && request.resource.data.role == 'player';
+      allow update: if request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // Игры
+    match /games/{gameId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+        && request.resource.data.authorId == request.auth.uid;
+      allow update: if isAuth()
+        && resource.data.authorId == request.auth.uid;
+      allow delete: if isAuth()
+        && resource.data.authorId == request.auth.uid;
+    }
+
+    // Вопросы (подколлекция games/{gameId}/questions)
+    match /games/{gameId}/questions/{questionId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
+      allow update: if isAuth()
+        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
+      allow delete: if isAuth()
+        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
+    }
+
+    // Сессии
+    match /sessions/{sessionId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+        && request.resource.data.hostId == request.auth.uid;
+      allow update: if isAuth()
+        && resource.data.hostId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Команды
+    match /teams/{teamId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+        && request.resource.data.name is string
+        && request.resource.data.name != '';
+      allow update: if isAuth()
+        && resource.data.sessionId == request.resource.data.sessionId;
+      allow delete: if false;
+    }
+
+    // Ответы
+    match /answers/{answerId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+        && request.resource.data.teamId is string
+        && request.resource.data.answerIndex is number;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

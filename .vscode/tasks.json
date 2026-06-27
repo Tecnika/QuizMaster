@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev (web)",
+      "type": "npm",
+      "script": "dev",
+      "path": "packages/web",
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "build (all)",
+      "type": "npm",
+      "script": "build",
+      "path": "",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "test (unit)",
+      "type": "npm",
+      "script": "test:unit",
+      "path": "",
+      "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "type": "npm",
+      "script": "lint",
+      "path": "",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "deploy firestore",
+      "type": "shell",
+      "command": "firebase deploy --only firestore",
+      "problemMatcher": []
+    }
+  ]
+}
