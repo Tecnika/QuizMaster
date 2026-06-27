@@ -9,7 +9,7 @@ interface Game {
   title: string;
   type: string;
   status: string;
-  createdAt: number;
+  createdAt: string;
 }
 
 export default function AdminPage() {
@@ -21,7 +21,7 @@ export default function AdminPage() {
     if (!user) { nav('/login'); return; }
     const q = query(collection(db, 'games'), where('authorId', '==', user.uid));
     const unsub = onSnapshot(q, (snap) => {
-      setGames(snap.docs.map((d) => d.data() as Game));
+      setGames(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game)));
     });
     return () => unsub();
   }, [user]);
