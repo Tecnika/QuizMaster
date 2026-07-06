@@ -7,4 +7,6 @@ dist/
 .DS_Store
 coverage/
 .turbo/
+.prompts/
+.opencode/
 
