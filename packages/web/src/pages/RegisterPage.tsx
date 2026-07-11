@@ -7,13 +7,12 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await register(email, password, displayName);
+      await register(email, password);
       nav('/admin');
     } catch (err: any) {
       setError(err.message);
@@ -24,7 +23,6 @@ export default function RegisterPage() {
     <main style={{ maxWidth: 400, margin: '100px auto', padding: '2rem' }}>
       <h1>Регистрация</h1>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <input type="text" placeholder="Имя" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required />
         {error && <p style={{ color: 'red' }}>{error}</p>}

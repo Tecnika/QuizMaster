@@ -14,7 +14,7 @@ interface AuthContextValue {
   loading: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, displayName: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -46,10 +46,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password);
   }, []);
 
-  const register = useCallback(async (email: string, password: string, displayName: string) => {
+  const register = useCallback(async (email: string, password: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await setDoc(doc(db, 'users', cred.user.uid), {
-      email, displayName, role: 'player', createdAt: new Date().toISOString(),
+      email, role: 'player', createdAt: new Date().toISOString(),
     });
   }, []);
 
