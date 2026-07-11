@@ -19,7 +19,7 @@ function ProtectedRoute({ children, adminOnly = false }: { children: JSX.Element
 }
 
 function NavBar() {
-  const { user } = useAuth();
+  const { user, userLogin } = useAuth();
   return (
     <nav style={{ display: 'flex', gap: '1rem', padding: '1rem 2rem', borderBottom: '1px solid #ddd', alignItems: 'center' }}>
       <Link to="/" style={{ fontWeight: 'bold' }}>QuizMaster</Link>
@@ -30,7 +30,7 @@ function NavBar() {
       <div style={{ marginLeft: 'auto' }}>
         {user ? (
           <>
-            <span style={{ marginRight: '1rem' }}>{user.email}</span>
+            <span style={{ marginRight: '1rem' }}>{userLogin || user.email}</span>
             <Link to="/login">Выйти</Link>
           </>
         ) : (

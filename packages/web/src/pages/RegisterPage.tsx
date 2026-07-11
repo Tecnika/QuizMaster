@@ -15,7 +15,11 @@ export default function RegisterPage() {
       await register(loginName, password);
       nav('/admin');
     } catch (err: any) {
-      setError(err.message);
+      const msg = err.code === 'auth/email-already-in-use' ? 'Такой логин уже занят'
+        : err.code === 'auth/invalid-email' ? 'Логин содержит недопустимые символы'
+        : err.code === 'auth/weak-password' ? 'Пароль слишком короткий (минимум 6 символов)'
+        : err.message;
+      setError(msg);
     }
   };
 

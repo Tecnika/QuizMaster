@@ -15,7 +15,12 @@ export default function LoginPage() {
       await login(loginName, password);
       nav('/admin');
     } catch (err: any) {
-      setError(err.message);
+      const msg = err.code === 'auth/user-not-found' ? 'Неверный логин или пароль'
+        : err.code === 'auth/wrong-password' ? 'Неверный логин или пароль'
+        : err.code === 'auth/invalid-email' ? 'Логин содержит недопустимые символы'
+        : err.code === 'auth/email-already-in-use' ? 'Такой логин уже занят'
+        : err.message;
+      setError(msg);
     }
   };
 
