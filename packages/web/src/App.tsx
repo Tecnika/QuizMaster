@@ -10,6 +10,7 @@ import GameEditorPage from './pages/GameEditorPage';
 import SessionHostPage from './pages/SessionHostPage';
 import JoinPage from './pages/JoinPage';
 import PlayerPage from './pages/PlayerPage';
+import ScreenPage from './pages/ScreenPage';
 import RulesPage from './pages/RulesPage';
 
 function Protected({ children }: { children: JSX.Element }) {
@@ -27,7 +28,7 @@ function Protected({ children }: { children: JSX.Element }) {
 
 function Shell({ children }: { children: JSX.Element }) {
   const location = useLocation();
-  const bare = location.pathname.startsWith('/play/') || location.pathname.startsWith('/session/');
+  const bare = location.pathname.startsWith('/play/') || location.pathname.startsWith('/session/') || location.pathname.startsWith('/screen/');
   if (bare) return children;
   return (
     <div className="qm-app">
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/:code" element={<JoinPage />} />
           <Route path="/play/:sessionId" element={<PlayerPage />} />
+          <Route path="/screen/:sessionId" element={<ScreenPage />} />
           <Route path="/cabinet" element={<Protected><CabinetPage /></Protected>} />
           <Route path="/games/new" element={<Protected><NewGamePage /></Protected>} />
           <Route path="/games/:gameId/edit" element={<Protected><GameEditorPage /></Protected>} />

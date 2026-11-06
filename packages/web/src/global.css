@@ -286,6 +286,8 @@ p { line-height: 1.55; }
 }
 .millionaire-answer .letter { font-weight: 700; color: #f6d36b; width: 1.2em; }
 .millionaire-answer.selected { border-color: #f6d36b; background: linear-gradient(180deg, #2a2f7a, #171b58); box-shadow: 0 0 0 3px rgba(246, 211, 107, 0.25), inset 0 0 28px rgba(246, 211, 107, 0.2); }
+.millionaire-answer.selectable { cursor: pointer; }
+.millionaire-answer.selectable:hover { border-color: #d9b44a; transform: translateY(-1px); }
 .millionaire-answer.correct { border-color: #37d67a; background: linear-gradient(180deg, #0f6b3a, #0a4a28); box-shadow: 0 0 0 3px rgba(55, 214, 122, 0.25); }
 .millionaire-answer.wrong { border-color: #ff5a6a; background: linear-gradient(180deg, #6b1420, #4a0c16); }
 .millionaire-answer.hidden-5050 { opacity: 0.16; pointer-events: none; }
@@ -313,6 +315,12 @@ p { line-height: 1.55; }
 .millionaire-tool:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .millionaire-status { text-align: center; font-family: var(--font-display); font-size: 1.1rem; color: #f6d36b; }
+.tv-answer-key { text-align: center; font-size: 0.85rem; font-weight: 700; color: #f6d36b; opacity: 0.8; margin-top: 0.4rem; }
+.tv-svoya .tv-answer-key { color: #ffd447; }
+.millionaire-players { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.millionaire-player { flex: 1 1 140px; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.7rem; border: 1px solid #2c3a8a; border-radius: 6px; background: rgba(20, 26, 80, 0.7); color: #b9c0ff; }
+.millionaire-player.active { border-color: #f6d36b; color: #fff; box-shadow: 0 0 0 2px rgba(246, 211, 107, 0.2); }
+.millionaire-player .v { font-family: var(--font-display); font-weight: 700; color: #f6d36b; }
 .millionaire-audience { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; align-items: end; height: 120px; padding: 0.5rem; }
 .millionaire-audience .bar { background: linear-gradient(180deg, #7f8cff, #3a46b8); border-radius: 4px 4px 0 0; min-height: 4px; position: relative; }
 .millionaire-audience .bar span { position: absolute; top: -1.2rem; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: #d7dbff; }

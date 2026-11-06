@@ -64,7 +64,7 @@ export default function SessionHostPage() {
   const [newName, setNewName] = useState('');
   const [bidInput, setBidInput] = useState('');
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'players' | 'screen' | null>(null);
 
   const sessionRef = useMemo(
     () => (sessionId ? doc(db, 'sessions', sessionId) : null),
@@ -196,9 +196,16 @@ export default function SessionHostPage() {
     });
   };
 
+  const selectManualAnswer = async (index: number) => {
+    if (!turn || turn.status !== 'answering') return;
+    await patchSession({ turn: { ...turn, chosenIndex: index } });
+  };
+
   const revealMillionaire = async () => {
     if (!session || !turn || !currentQuestion) return;
-    const mine = turnAnswers.filter((a) => a.participantId === turn.participantId).at(-1);
+    const mine = turn.chosenIndex != null
+      ? { choice: turn.chosenIndex }
+      : turnAnswers.filter((a) => a.participantId === turn.participantId).at(-1);
     const chosen = mine?.choice ?? -1;
     const correct = chosen === currentQuestion.correctIndex;
     const { prize } = resolveMillionaireAnswer(
@@ -417,6 +424,12 @@ export default function SessionHostPage() {
   }
 
   const joinUrl = `${window.location.origin}/QuizMaster/join/${session.code}`;
+  const screenUrl = `${window.location.origin}/QuizMaster/screen/${sessionId}`;
+  const copyLink = (url: string, kind: 'players' | 'screen') => {
+    void navigator.clipboard?.writeText(url);
+    setCopied(kind);
+    window.setTimeout(() => setCopied(null), 1500);
+  };
 
   return (
     <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : 'tv-svoya'}`}>
@@ -428,16 +441,13 @@ export default function SessionHostPage() {
           <span className="qm-badge">{session.status}</span>
         </div>
         <div className="qm-inline">
-          <button
-            className="tv-icon-btn"
-            onClick={() => {
-              void navigator.clipboard?.writeText(joinUrl);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 1500);
-            }}
-          >
-            {copied ? 'Ссылка скопирована' : 'Копировать ссылку игрокам'}
+          <button className="tv-icon-btn" onClick={() => copyLink(joinUrl, 'players')}>
+            {copied === 'players' ? 'Ссылка игрокам скопирована' : 'Ссылка игрокам'}
           </button>
+          <button className="tv-icon-btn" onClick={() => copyLink(screenUrl, 'screen')}>
+            {copied === 'screen' ? 'Ссылка на экран скопирована' : 'Ссылка на экран'}
+          </button>
+          <a className="tv-icon-btn" href={screenUrl} target="_blank" rel="noreferrer">Открыть экран</a>
           {session.status === 'lobby' && (
             <button className="tv-icon-btn" onClick={() => void startGame()}>Начать игру</button>
           )}
@@ -512,6 +522,11 @@ export default function SessionHostPage() {
                   Играет: {participants.find((p) => p.id === turn.participantId)?.name}
                   {' · '}вопрос {turn.questionIndex + 1} из 15
                 </div>
+                {currentQuestion && (
+                  <div className="tv-answer-key">
+                    Ответ ведущего: {'ABCD'[currentQuestion.correctIndex ?? 0]} — {currentQuestion.options?.[currentQuestion.correctIndex ?? 0]}
+                  </div>
+                )}
                 {session.publicQuestion && (
                   <>
                     <div className="millionaire-question">{session.publicQuestion.text}</div>
@@ -529,7 +544,10 @@ export default function SessionHostPage() {
                               hidden ? 'hidden-5050' : '',
                               correct ? 'correct' : '',
                               wrong ? 'wrong' : '',
+                              turn.status === 'answering' ? 'selectable' : '',
+                              turn.chosenIndex === i ? 'selected' : '',
                             ].join(' ')}
+                            onClick={() => turn.status === 'answering' && void selectManualAnswer(i)}
                           >
                             <span className="letter">{'ABCD'[i]}</span>
                             <span>{text}</span>
@@ -565,11 +583,16 @@ export default function SessionHostPage() {
                   {turn.status === 'answering' && (
                     <>
                       <span className="qm-small" style={{ color: '#b9c0ff' }}>
-                        {turnAnswers.filter((a) => a.participantId === turn.participantId).length
-                          ? 'Ответ получен'
-                          : 'Ответ пока не получен'}
+                        {turn.chosenIndex != null
+                          ? 'Ответ зафиксирован ведущим'
+                          : turnAnswers.filter((a) => a.participantId === turn.participantId).length
+                            ? 'Ответ получен'
+                            : 'Ответ пока не получен'}
                       </span>
                       <div className="qm-inline">
+                        {turn.chosenIndex != null && (
+                          <button className="tv-icon-btn" onClick={() => void patchSession({ turn: { ...turn, chosenIndex: null } })}>Сбросить</button>
+                        )}
                         <button className="tv-icon-btn" onClick={() => void takeMoney()}>Забрать деньги</button>
                         <button className="tv-icon-btn" onClick={() => void revealMillionaire()}>Показать ответ</button>
                       </div>
@@ -677,6 +700,7 @@ export default function SessionHostPage() {
               {session.publicQuestion.text}
             </div>
           )}
+          {currentQuestion && <div className="tv-answer-key">Ответ ведущего: {currentQuestion.answer}</div>}
 
           {session.publicQuestion?.kind === 'cat' && !session.catRecipientId && (
             <div className="svoya-actions">
