@@ -188,6 +188,8 @@ p { line-height: 1.55; }
 .qm-stat { text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.5); border: 1px solid #d9c6a4; border-radius: 12px; }
 .qm-stat b { display: block; font-family: var(--font-display); font-size: 1.4rem; color: var(--green); }
 .qm-stat span { font-size: 0.78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; }
+.qm-result-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 1rem; background: rgba(255, 255, 255, 0.5); border: 1px solid #d9c6a4; border-radius: 12px; color: var(--ink); }
+.qm-result-row b { font-family: var(--font-display); font-size: 1.2rem; color: var(--green); }
 
 /* ---------- Главная ---------- */
 .qm-hero {

@@ -200,14 +200,14 @@ export default function SessionHostPage() {
     const mine = turnAnswers.filter((a) => a.participantId === turn.participantId).at(-1);
     const chosen = mine?.choice ?? -1;
     const correct = chosen === currentQuestion.correctIndex;
-    const { prize, finished } = resolveMillionaireAnswer(
+    const { prize } = resolveMillionaireAnswer(
       turn.questionIndex + 1,
       correct,
       game?.settings?.ladder ?? MILLIONAIRE_LADDER,
     );
     const nextTurn: MillionaireTurn = {
       ...turn,
-      status: finished ? 'finished' : 'revealed',
+      status: 'revealed',
       chosenIndex: chosen,
       correct,
       prize,
@@ -577,7 +577,7 @@ export default function SessionHostPage() {
                   {turn.status === 'revealed' && (
                     <div className="qm-inline">
                       <span className="millionaire-status">{turn.correct ? 'Верно!' : 'Неверно'} {turn.prize?.toLocaleString('ru-RU')}</span>
-                      {turn.questionIndex + 1 < questions.length && (
+                      {turn.correct && turn.questionIndex + 1 < questions.length && (
                         <button className="tv-icon-btn" onClick={() => void nextQuestion()}>Следующий вопрос →</button>
                       )}
                       <button className="tv-icon-btn" onClick={() => void patchSession({ turn: { ...turn, status: 'finished' } })}>Завершить ход</button>
@@ -770,8 +770,8 @@ export default function SessionHostPage() {
             <h2 className="qm-title">Игра завершена</h2>
             <div className="qm-grid qm-mt">
               {[...participants].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).map((p, i) => (
-                <div key={p.id} className="qm-stat" style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between' }}>
-                  <span><b style={{ display: 'inline', marginRight: 8 }}>{i + 1}.</b>{p.name}</span>
+                <div key={p.id} className="qm-result-row">
+                  <span>{i + 1}. {p.name}</span>
                   <b>{p.score ?? 0}</b>
                 </div>
               ))}
