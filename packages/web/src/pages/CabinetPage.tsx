@@ -4,6 +4,7 @@ import { collection, query, where, onSnapshot, deleteDoc, doc, getDocs } from 'f
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
+import { IconBrain, IconCoins, IconFolder, IconPlus } from '../components/icons';
 import type { Game } from '@quizmaster/shared';
 
 export default function CabinetPage() {
@@ -52,14 +53,14 @@ export default function CabinetPage() {
           <h1 className="qm-title">Мои игры</h1>
           <p className="qm-subtitle">Привет, {userLogin || 'автор'}. Здесь твои игры и запуск сессий.</p>
         </div>
-        <Link className="qm-btn qm-btn-primary qm-btn-lg" to="/games/new">+ Новая игра</Link>
+        <Link className="qm-btn qm-btn-primary qm-btn-lg" to="/games/new"><IconPlus size={18} /> Новая игра</Link>
       </div>
 
       {error && <div className="qm-card qm-danger-text">{error}</div>}
 
       {games.length === 0 ? (
         <div className="qm-card qm-empty">
-          <span className="icon">🗂️</span>
+          <span className="icon"><IconFolder size={40} /></span>
           <p>Пока нет игр. Создайте первую — это займёт минуту.</p>
           <Link className="qm-btn qm-btn-gold" to="/games/new">Создать игру</Link>
         </div>
@@ -70,7 +71,7 @@ export default function CabinetPage() {
               <div className="qm-game">
                 <div className="qm-game-main">
                   <div className={`qm-game-icon${game.type === 'svoya' ? ' svoya' : ''}`}>
-                    {game.type === 'millionaire' ? '💰' : '🧠'}
+                    {game.type === 'millionaire' ? <IconCoins size={26} /> : <IconBrain size={26} />}
                   </div>
                   <div>
                     <div className="qm-card-title">{game.title}</div>

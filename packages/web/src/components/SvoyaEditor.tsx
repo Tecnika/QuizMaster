@@ -7,6 +7,7 @@ import {
   type Question,
   type QuestionKind,
 } from '@quizmaster/shared';
+import { IconCat, IconCheck, IconGavel, IconPuzzle } from './icons';
 
 interface Props {
   gameId: string;
@@ -268,7 +269,11 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
                           }}
                           onClick={() => q && edit(q)}
                         >
-                          {q ? (q.kind === 'cat' ? '🐱' : q.kind === 'auction' ? '🔨' : '✓') : '·'}
+                          {q ? (
+                            q.kind === 'cat' ? <IconCat size={16} /> :
+                            q.kind === 'auction' ? <IconGavel size={16} /> :
+                            <IconCheck size={16} />
+                          ) : '·'}
                         </div>
                       );
                     })}
@@ -308,7 +313,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
 
       {questions.length === 0 && (
         <div className="qm-card qm-empty">
-          <span className="icon">🧩</span>
+          <span className="icon"><IconPuzzle size={40} /></span>
           <p>Пока нет вопросов. Добавьте первый — табло соберётся автоматически.</p>
         </div>
       )}

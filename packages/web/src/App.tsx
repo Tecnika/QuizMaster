@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth';
+import { IconDice } from './components/icons';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -41,7 +42,7 @@ function NavBar() {
   return (
     <nav className="qm-nav">
       <a className="qm-nav-brand" href="/QuizMaster/">
-        <span className="dice">🎲</span> QuizMaster
+        <IconDice size={22} /> QuizMaster
       </a>
       {user && <a className="qm-nav-link" href="/QuizMaster/cabinet">Кабинет</a>}
       <a className="qm-nav-link" href="/QuizMaster/join">Присоединиться</a>

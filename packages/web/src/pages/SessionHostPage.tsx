@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
+import { IconCat, IconCheck, IconGavel } from '../components/icons';
 import {
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
@@ -650,7 +651,7 @@ export default function SessionHostPage() {
                                 disabled={cell.used}
                                 onClick={() => void openCell(cell)}
                               >
-                                {cell.used ? '—' : cell.kind === 'cat' ? '🐱' : cell.kind === 'auction' ? '🔨' : v}
+                                {cell.used ? '—' : cell.kind === 'cat' ? <IconCat size={18} /> : cell.kind === 'auction' ? <IconGavel size={18} /> : v}
                               </button>
                             </td>
                           );

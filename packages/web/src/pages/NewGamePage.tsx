@@ -9,6 +9,7 @@ import {
   SVOYA_DEFAULT_ROUNDS,
   type GameType,
 } from '@quizmaster/shared';
+import { IconBrain, IconCoins } from '../components/icons';
 
 export default function NewGamePage() {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ export default function NewGamePage() {
               onClick={() => setType('millionaire')}
               style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'millionaire' ? 'var(--green)' : undefined, boxShadow: type === 'millionaire' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
             >
-              <div className="icon">💰</div>
+              <div className="icon"><IconCoins size={32} /></div>
               <h3>Кто хочет стать миллионером?</h3>
               <p>15 вопросов, лестница сумм, несгораемые рубежи, подсказки.</p>
             </button>
@@ -94,7 +95,7 @@ export default function NewGamePage() {
               onClick={() => setType('svoya')}
               style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'svoya' ? 'var(--green)' : undefined, boxShadow: type === 'svoya' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
             >
-              <div className="icon">🧠</div>
+              <div className="icon"><IconBrain size={32} /></div>
               <h3>Своя игра</h3>
               <p>Табло тем и стоимостей, раунды, «Кот в мешке», «Аукцион», финал.</p>
             </button>

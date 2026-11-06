@@ -73,7 +73,7 @@ p { line-height: 1.55; }
   color: var(--gold-2); text-decoration: none; letter-spacing: 0.5px;
   margin-right: 0.75rem;
 }
-.qm-nav-brand span.dice { font-size: 1.35rem; }
+.qm-nav-brand svg { flex: none; }
 .qm-nav-link {
   color: #f3e4c8; text-decoration: none; font-size: 0.95rem;
   padding: 0.4rem 0.7rem; border-radius: 8px; white-space: nowrap;
@@ -172,7 +172,7 @@ p { line-height: 1.55; }
 .qm-divider { height: 1px; background: linear-gradient(90deg, transparent, #cbb58f, transparent); margin: 1.1rem 0; }
 
 .qm-empty { text-align: center; color: var(--ink-soft); padding: 2rem 1rem; }
-.qm-empty .icon { font-size: 2.2rem; display: block; margin-bottom: 0.5rem; }
+.qm-empty .icon { display: flex; justify-content: center; color: var(--ink-soft); margin-bottom: 0.5rem; }
 
 .qm-grid { display: grid; gap: 1rem; }
 .qm-grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
@@ -196,15 +196,15 @@ p { line-height: 1.55; }
   background-size: 120px 120px;
 }
 .qm-feature { text-align: left; }
-.qm-feature .icon { font-size: 1.8rem; }
+.qm-feature .icon { display: flex; align-items: center; color: var(--green); margin-bottom: 0.25rem; }
 .qm-feature h3 { margin: 0.4rem 0 0.3rem; }
 .qm-feature p { color: var(--ink-soft); font-size: 0.93rem; margin: 0; }
 
 /* ---------- Список игр ---------- */
 .qm-game { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .qm-game-main { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
-.qm-game-icon { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px; font-size: 1.4rem; background: #f7e9b8; border: 1px solid #e2c766; }
-.qm-game-icon.svoya { background: #d9e2f7; border-color: #a8b9e2; }
+.qm-game-icon { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px; color: #7a5a10; background: #f7e9b8; border: 1px solid #e2c766; }
+.qm-game-icon.svoya { color: #243c78; background: #d9e2f7; border-color: #a8b9e2; }
 .qm-game-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* ---------- Редактор ---------- */

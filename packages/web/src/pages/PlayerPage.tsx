@@ -6,6 +6,7 @@ import {
   subscribeParticipants,
   subscribeSession,
 } from '../lib/session';
+import { IconCheck, IconCross } from '../components/icons';
 import type { Participant, Session } from '@quizmaster/shared';
 
 export default function PlayerPage() {
@@ -165,7 +166,15 @@ export default function PlayerPage() {
 
               {turn?.status === 'revealed' && (
                 <div className="player-status">
-                  {turn.correct ? '✅ Верно!' : '❌ Увы, ответ неверный.'}
+                  {turn.correct ? (
+                    <span className="qm-inline" style={{ justifyContent: 'center', color: '#7dffb0' }}>
+                      <IconCheck size={18} /> Верно!
+                    </span>
+                  ) : (
+                    <span className="qm-inline" style={{ justifyContent: 'center', color: '#ff9aa6' }}>
+                      <IconCross size={18} /> Увы, ответ неверный.
+                    </span>
+                  )}
                   {turn.prize != null && <> Выигрыш: <b>{turn.prize.toLocaleString('ru-RU')}</b></>}
                 </div>
               )}
