@@ -29,7 +29,7 @@ export default function PlayerPage() {
   useEffect(() => {
     setSelected(null);
     setSent(false);
-  }, [qid, session?.turn?.participantId, session?.buzzedParticipantId]);
+  }, [qid, session?.turn?.participantId, session?.turn?.turnId, session?.buzzedParticipantId]);
 
   if (!sessionId || !claim) {
     return (
