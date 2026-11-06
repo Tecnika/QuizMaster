@@ -2,70 +2,106 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAuth() {
+    function signedIn() {
       return request.auth != null;
     }
 
-    // Пользователи
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function isAuthor(gameId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == uid();
+    }
+
+    function isHost(sessionId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/sessions/$(sessionId)).data.hostId == uid();
+    }
+
+    // Профили авторов
     match /users/{userId} {
-      allow read: if isAuth() && request.auth.uid == userId;
-      allow create: if request.auth.uid == userId
-        && request.resource.data.role == 'player';
-      allow update: if request.auth.uid == userId;
-      allow delete: if false;
+      allow get: if signedIn() && uid() == userId;
+      allow create: if signedIn() && uid() == userId
+        && request.resource.data.role == 'author';
+      allow update: if signedIn() && uid() == userId
+        && request.resource.data.role == resource.data.role;
+      allow delete: if signedIn() && uid() == userId;
+      allow list: if false;
     }
 
-    // Игры
+    // Игры: каталог публичный, редактирует только автор
     match /games/{gameId} {
-      allow read: if isAuth();
-      allow create: if isAuth()
-        && request.resource.data.authorId == request.auth.uid;
-      allow update: if isAuth()
-        && resource.data.authorId == request.auth.uid;
-      allow delete: if isAuth()
-        && resource.data.authorId == request.auth.uid;
+      allow get: if true;
+      allow list: if true;
+      allow create: if signedIn()
+        && request.resource.data.authorId == uid();
+      allow update, delete: if signedIn()
+        && resource.data.authorId == uid();
+
+      // Вопросы содержат правильные ответы — читает только автор
+      match /questions/{questionId} {
+        allow read: if isAuthor(gameId);
+        allow write: if isAuthor(gameId);
+      }
     }
 
-    // Вопросы (подколлекция games/{gameId}/questions)
-    match /games/{gameId}/questions/{questionId} {
-      allow read: if isAuth();
-      allow create: if isAuth()
-        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
-      allow update: if isAuth()
-        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
-      allow delete: if isAuth()
-        && get(/databases/$(database)/documents/games/$(gameId)).data.authorId == request.auth.uid;
+    // Коды подключения: публичный get по коду
+    match /joinCodes/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.hostId == uid()
+        && get(/databases/$(database)/documents/sessions/$(request.resource.data.sessionId)).data.hostId == uid();
+      allow delete: if signedIn() && resource.data.hostId == uid();
     }
 
     // Сессии
     match /sessions/{sessionId} {
-      allow read: if isAuth();
-      allow create: if isAuth()
-        && request.resource.data.hostId == request.auth.uid;
-      allow update: if isAuth()
-        && resource.data.hostId == request.auth.uid;
-      allow delete: if false;
-    }
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.hostId == uid()
+        && get(/databases/$(database)/documents/games/$(request.resource.data.gameId)).data.authorId == uid();
+      allow update, delete: if isHost(sessionId);
 
-    // Команды
-    match /teams/{teamId} {
-      allow read: if isAuth();
-      allow create: if isAuth()
-        && request.resource.data.name is string
-        && request.resource.data.name != '';
-      allow update: if isAuth()
-        && resource.data.sessionId == request.resource.data.sessionId;
-      allow delete: if false;
-    }
+      // Участники: имена видны всем, меняет только ведущий
+      match /participants/{participantId} {
+        allow read: if true;
+        allow write: if isHost(sessionId);
+      }
 
-    // Ответы
-    match /answers/{answerId} {
-      allow read: if isAuth();
-      allow create: if isAuth()
-        && request.resource.data.teamId is string
-        && request.resource.data.answerIndex is number;
-      allow update: if false;
-      allow delete: if false;
+      // Публичная метка «имя занято»
+      match /claims/{participantId} {
+        allow read: if true;
+        allow create: if exists(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(participantId));
+        allow update: if false;
+        allow delete: if isHost(sessionId);
+      }
+
+      // Секретный токен участника: пишется один раз, читает только ведущий
+      match /tokens/{participantId} {
+        allow read: if isHost(sessionId);
+        allow create: if exists(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(participantId))
+          && request.resource.data.token is string
+          && request.resource.data.token.size() >= 16;
+        allow update: if false;
+        allow delete: if isHost(sessionId);
+      }
+
+      // Ответы и «нажатия»: пишет участник со своим токеном, читает ведущий
+      match /answers/{answerId} {
+        allow read: if isHost(sessionId);
+        allow create: if request.resource.data.participantId is string
+          && request.resource.data.questionId is string
+          && request.resource.data.token is string
+          && exists(/databases/$(database)/documents/sessions/$(sessionId)/tokens/$(request.resource.data.participantId))
+          && get(/databases/$(database)/documents/sessions/$(sessionId)/tokens/$(request.resource.data.participantId)).data.token
+            == request.resource.data.token;
+        allow update: if false;
+        allow delete: if isHost(sessionId);
+      }
     }
   }
 }

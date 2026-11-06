@@ -1,19 +1,34 @@
-export type GameType = 'millioner' | 'svoya_igra';
-
-export type GameStatus = 'draft' | 'published' | 'archived';
+export type GameType = 'millionaire' | 'svoya';
+export type GameStatus = 'draft' | 'ready' | 'archived';
+export type UserRole = 'author' | 'admin';
 
 export type SessionStatus = 'lobby' | 'active' | 'paused' | 'finished';
+export type QuestionKind = 'normal' | 'cat' | 'auction';
+export type MillionaireTurnStatus = 'answering' | 'revealed' | 'finished';
 
-export type UserRole = 'admin' | 'player';
-
-export interface User {
-  id: string;
-  firebaseUid: string;
+export interface UserProfile {
+  login: string;
   email: string;
-  displayName: string;
   role: UserRole;
   createdAt: string;
-  updatedAt: string;
+}
+
+export interface SvoyaRound {
+  name: string;
+  values: number[];
+}
+
+export interface GameSettings {
+  /** Лестница «Миллионера» (15 значений). */
+  ladder?: number[];
+  /** Несгораемые вопросы (1-based). */
+  safeHavens?: number[];
+  /** Раунды «Своей игры». */
+  rounds?: SvoyaRound[];
+  /** Разрешить «Кота в мешке» и «Аукцион». */
+  allowSpecial?: boolean;
+  /** Проводить финальный раунд. */
+  finalRound?: boolean;
 }
 
 export interface Game {
@@ -23,62 +38,111 @@ export interface Game {
   type: GameType;
   authorId: string;
   status: GameStatus;
+  settings: GameSettings;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface QuestionMillioner {
+export interface Question {
   id: string;
-  gameId: string;
-  questionText: string;
-  options: QuestionOption[];
-  correctAnswer: string;
-  difficulty: number;
-  hint505: string;
-  hintCall: string;
-  sortOrder: number;
-}
-
-export interface QuestionOption {
-  label: 'A' | 'B' | 'C' | 'D';
+  order: number;
   text: string;
+  answer: string;
+  comment?: string;
+
+  /** «Миллионер» */
+  options?: string[];
+  correctIndex?: number;
+  level?: number;
+
+  /** «Своя игра» */
+  round?: number;
+  theme?: string;
+  value?: number;
+  kind?: QuestionKind;
 }
 
-export interface QuestionSvoyaIgra {
+/** Вопрос, который видят игроки: без правильного ответа. */
+export interface PublicQuestion {
   id: string;
-  gameId: string;
-  category: string;
-  value: number;
-  questionText: string;
-  correctAnswer: string;
-  isDailyDouble: boolean;
+  text: string;
+  options?: string[];
+  round?: number;
+  theme?: string;
+  value?: number;
+  kind?: QuestionKind;
 }
 
-export interface Team {
+export interface Participant {
   id: string;
   name: string;
+  score: number;
   color: string;
-  sessionId: string;
-  score?: number;
 }
 
-export interface GameSession {
+export interface Lifelines {
+  fifty: boolean;
+  audience: boolean;
+  phone: boolean;
+}
+
+export interface MillionaireTurn {
+  participantId: string;
+  questionIndex: number;
+  status: MillionaireTurnStatus;
+  lifelines: Lifelines;
+  /** Индексы вариантов, оставшихся после 50/50. */
+  fiftyOptions?: number[];
+  /** Результат «Помощи зала» в процентах по вариантам. */
+  audience?: number[];
+  /** Вариант, который подсказал «звонок другу». */
+  phoneHint?: number | null;
+  chosenIndex?: number | null;
+  correct?: boolean | null;
+  /** Текущий гарантированный выигрыш. */
+  prize?: number;
+}
+
+export interface SvoyaCell {
+  questionId: string;
+  round: number;
+  theme: string;
+  value: number;
+  kind: QuestionKind;
+  used: boolean;
+}
+
+export interface Session {
   id: string;
   gameId: string;
+  gameType: GameType;
   hostId: string;
+  code: string;
   status: SessionStatus;
-  currentQuestionId: string | null;
-  currentState: Record<string, unknown>;
-  teams: Team[];
-  startedAt: string | null;
-  finishedAt: string | null;
   createdAt: string;
+  updatedAt: string;
+  publicQuestion: PublicQuestion | null;
+  revealedCorrectIndex: number | null;
+  revealedAnswer: string | null;
+  turn?: MillionaireTurn | null;
+  board?: SvoyaCell[] | null;
+  activeCellId?: string | null;
+  buzzedParticipantId?: string | null;
+  finalStage?: {
+    active: boolean;
+    themes: string[];
+    theme: string | null;
+    question: string | null;
+    answer: string | null;
+  } | null;
 }
 
-export interface FirestoreSession {
-  status: SessionStatus;
-  currentQuestion: Record<string, unknown> | null;
-  teams: Pick<Team, 'id' | 'name' | 'color' | 'score'>[];
-  state: Record<string, unknown>;
-  updatedAt: number;
+export interface Answer {
+  id: string;
+  participantId: string;
+  questionId: string;
+  type: 'choice' | 'buzz' | 'text';
+  choice?: number;
+  text?: string;
+  createdAt: string;
 }

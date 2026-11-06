@@ -1,1 +1,3 @@
-export { calculateEarnedSum, getFireproofSum, FIREPROOF_SUMS, LEVEL_PRIZES } from './scoring';
+export * from './millionaire';
+export * from './svoya';
+export * from './code';

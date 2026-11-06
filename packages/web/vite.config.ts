@@ -7,9 +7,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      '@quizmaster/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
-  base: './',
+  base: '/QuizMaster/',
   build: {
     outDir: 'dist',
     sourcemap: true,

@@ -8,17 +8,22 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import type { UserRole } from '@quizmaster/shared';
 
 const AUTH_DOMAIN = '@quizmaster.app';
 
-function loginToEmail(login: string): string {
+export function loginToEmail(login: string): string {
   return `${login.toLowerCase().replace(/[^a-z0-9_-]/g, '')}${AUTH_DOMAIN}`;
+}
+
+export function isValidLogin(login: string): boolean {
+  return /^[a-zA-Z0-9_]{3,20}$/.test(login);
 }
 
 interface AuthContextValue {
   user: FirebaseUser | null;
   loading: boolean;
-  isAdmin: boolean;
+  role: UserRole | null;
   userLogin: string | null;
   login: (login: string, password: string) => Promise<void>;
   register: (login: string, password: string) => Promise<void>;
@@ -26,26 +31,36 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue>({
-  user: null, loading: true, isAdmin: false, userLogin: null,
-  login: async () => {}, register: async () => {}, logout: async () => {},
+  user: null,
+  loading: true,
+  role: null,
+  userLogin: null,
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [userLogin, setUserLogin] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        const snap = await getDoc(doc(db, 'users', u.uid));
-        const data = snap.data();
-        setIsAdmin(data?.role === 'admin');
-        setUserLogin(data?.login || null);
+        try {
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          const data = snap.data();
+          setRole((data?.role as UserRole) || 'author');
+          setUserLogin(data?.login || null);
+        } catch {
+          setRole('author');
+          setUserLogin(null);
+        }
       } else {
-        setIsAdmin(false);
+        setRole(null);
         setUserLogin(null);
       }
       setLoading(false);
@@ -61,7 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = loginToEmail(loginName);
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await setDoc(doc(db, 'users', cred.user.uid), {
-      login: loginName, email, role: 'player', createdAt: new Date().toISOString(),
+      login: loginName,
+      email,
+      role: 'author',
+      createdAt: new Date().toISOString(),
     });
   }, []);
 
@@ -70,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, userLogin, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, role, userLogin, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
