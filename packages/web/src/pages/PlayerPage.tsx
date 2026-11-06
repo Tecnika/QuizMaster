@@ -6,8 +6,9 @@ import {
   subscribeParticipants,
   subscribeSession,
 } from '../lib/session';
+import { useCountdown } from '../lib/useCountdown';
 import { IconCheck, IconCross } from '../components/icons';
-import type { Participant, Session } from '@quizmaster/shared';
+import { formatCountdown, type Participant, type Session } from '@quizmaster/shared';
 
 export default function PlayerPage() {
   const { sessionId } = useParams();
@@ -30,6 +31,8 @@ export default function PlayerPage() {
     setSelected(null);
     setSent(false);
   }, [qid, session?.turn?.participantId, session?.turn?.turnId, session?.buzzedParticipantId]);
+
+  const timeLeft = useCountdown(session?.timer?.endsAt ?? null);
 
   if (!sessionId || !claim) {
     return (
@@ -66,6 +69,10 @@ export default function PlayerPage() {
 
   const send = async (payload: { type: 'choice' | 'buzz'; choice?: number }) => {
     if (!question?.id) return;
+    if (timeLeft === 0) {
+      setError('Время вышло');
+      return;
+    }
     setError('');
     try {
       await submitAnswer(sessionId, claim, {
@@ -91,6 +98,7 @@ export default function PlayerPage() {
   const canAnswerSvoya = Boolean(question) && !catHidden && !auctionHidden && !catForOther && !auctionForOther;
   const catName = participants.find((p) => p.id === session.catRecipientId)?.name;
   const auctionName = participants.find((p) => p.id === session.auctionWinnerId)?.name;
+  const expired = timeLeft === 0;
 
   return (
     <div className="player-screen">
@@ -109,6 +117,12 @@ export default function PlayerPage() {
           <span className="qm-badge qm-badge-gold">Очки: {me.score ?? 0}</span>
         </div>
       </div>
+
+      {timeLeft != null && (
+        <div className={`player-timer${timeLeft === 0 ? ' warning' : ''}`}>
+          {timeLeft > 0 ? formatCountdown(timeLeft) : 'Время вышло'}
+        </div>
+      )}
 
       {session.status === 'lobby' && (
         <div className="player-status">Ждём начала игры. Ведущий скоро запустит сессию.</div>
@@ -151,7 +165,7 @@ export default function PlayerPage() {
                       <button
                         key={o.index}
                         className={`player-answer${selected === o.index ? ' selected' : ''}`}
-                        disabled={sent}
+                        disabled={sent || expired}
                         onClick={() => setSelected(o.index)}
                       >
                         <b style={{ color: '#ffd447' }}>{'ABCD'[o.index]}</b> {o.text}
@@ -160,7 +174,7 @@ export default function PlayerPage() {
                   </div>
                   <button
                     className="qm-btn qm-btn-gold qm-btn-block qm-btn-lg qm-mt"
-                    disabled={selected === null || sent}
+                    disabled={selected === null || sent || expired}
                     onClick={() => selected !== null && void send({ type: 'choice', choice: selected })}
                   >
                     {sent ? 'Ответ отправлен' : 'Ответить'}
@@ -232,7 +246,7 @@ export default function PlayerPage() {
                           <button
                             key={index}
                             className={`player-answer${selected === index ? ' selected' : ''}`}
-                            disabled={sent}
+                            disabled={sent || expired}
                             onClick={() => setSelected(index)}
                           >
                             <b style={{ color: '#ffd447' }}>{'ABCD'[index]}</b> {text}
@@ -244,7 +258,7 @@ export default function PlayerPage() {
                     {question.options?.length ? (
                       <button
                         className="qm-btn qm-btn-gold qm-btn-block qm-btn-lg qm-mt"
-                        disabled={selected === null || sent}
+                        disabled={selected === null || sent || expired}
                         onClick={() => selected !== null && void send({ type: 'choice', choice: selected })}
                       >
                         {sent ? 'Ответ отправлен' : 'Ответить'}
@@ -252,7 +266,7 @@ export default function PlayerPage() {
                     ) : (
                       <button
                         className="player-buzz"
-                        disabled={sent || Boolean(session.buzzedParticipantId)}
+                        disabled={sent || expired || Boolean(session.buzzedParticipantId)}
                         onClick={() => void send({ type: 'buzz' })}
                       >
                         {sent ? 'Нажатие отправлено' : 'Ответить!'}

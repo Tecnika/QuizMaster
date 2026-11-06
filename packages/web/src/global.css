@@ -109,6 +109,9 @@ p { line-height: 1.55; }
 }
 .qm-card + .qm-card { margin-top: 1rem; }
 .qm-grid > .qm-card + .qm-card { margin-top: 0; }
+.qm-qr { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 0.75rem; background: #fffaf0; border: 1px solid #d9c6a4; border-radius: 12px; }
+.qm-qr svg { display: block; }
+.qm-qr-lg { padding: 1rem; }
 .qm-card-title { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.35rem; }
 .qm-card-muted { color: var(--ink-soft); font-size: 0.92rem; }
 
@@ -244,6 +247,12 @@ p { line-height: 1.55; }
 .tv-logo { font-family: var(--font-display); font-weight: 700; letter-spacing: 1px; }
 .tv-icon-btn { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 10px; padding: 0.45rem 0.8rem; cursor: pointer; font-weight: 700; }
 .tv-icon-btn:hover { background: rgba(255, 255, 255, 0.18); }
+.tv-timer { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #f6d36b; font-variant-numeric: tabular-nums; }
+.tv-timer.warning { color: #ff5a6a; }
+.tv-timer-small { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: #f6d36b; font-variant-numeric: tabular-nums; }
+.tv-timer-small.warning { color: #ff5a6a; }
+.tv-svoya .tv-timer, .tv-svoya .tv-timer-small { color: #ffd447; }
+.tv-svoya .tv-timer.warning, .tv-svoya .tv-timer-small.warning { color: #ff6b9d; }
 
 /* ---------- ТВ: Миллионер ---------- */
 .tv-millionaire {
@@ -400,6 +409,8 @@ p { line-height: 1.55; }
 }
 .player-screen > * { width: 100%; max-width: 640px; }
 .player-screen > .player-toast { width: auto; max-width: calc(100% - 2rem); }
+.player-timer { text-align: center; font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #ffd447; margin-bottom: 0.75rem; font-variant-numeric: tabular-nums; }
+.player-timer.warning { color: #ff7a86; }
 .player-head { text-align: center; padding: 0.5rem 0 1rem; }
 .player-code { font-family: var(--font-display); letter-spacing: 6px; color: #ffd447; font-size: 1.4rem; }
 .player-question { font-family: var(--font-display); font-size: 1.2rem; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 212, 71, 0.4); border-radius: 12px; margin-bottom: 1rem; }

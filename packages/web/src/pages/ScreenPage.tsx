@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { useCountdown } from '../lib/useCountdown';
 import { subscribeParticipants, subscribeSession } from '../lib/session';
 import {
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
+  formatCountdown,
   type Game,
   type Participant,
   type Session,
@@ -39,6 +42,8 @@ export default function ScreenPage() {
     });
   }, [session?.gameId]);
 
+  const timeLeft = useCountdown(session?.timer?.endsAt ?? null);
+
   if (!loaded) {
     return (
       <div className="tv tv-millionaire">
@@ -68,12 +73,19 @@ export default function ScreenPage() {
             {session.status === 'lobby' ? 'ожидание' : session.status === 'finished' ? 'завершена' : 'идёт игра'}
           </span>
         </div>
-        <button
-          className="tv-icon-btn"
-          onClick={() => void document.documentElement.requestFullscreen?.()}
-        >
-          На весь экран
-        </button>
+        <div className="qm-inline">
+          {timeLeft != null && (
+            <span className={`tv-timer${timeLeft === 0 ? ' warning' : ''}`}>
+              {timeLeft > 0 ? formatCountdown(timeLeft) : 'Время вышло'}
+            </span>
+          )}
+          <button
+            className="tv-icon-btn"
+            onClick={() => void document.documentElement.requestFullscreen?.()}
+          >
+            На весь экран
+          </button>
+        </div>
       </div>
 
       {session.status === 'lobby' ? (
@@ -90,6 +102,7 @@ export default function ScreenPage() {
 }
 
 function ScreenLobby({ session, participants, title }: { session: Session; participants: Participant[]; title: string }) {
+  const joinUrl = `${window.location.origin}/QuizMaster/join/${session.code}`;
   return (
     <div className="qm-container" style={{ maxWidth: 760 }}>
       <div className="qm-card qm-center">
@@ -98,6 +111,10 @@ function ScreenLobby({ session, participants, title }: { session: Session; parti
         <p className="qm-card-muted" style={{ marginBottom: 0 }}>Код комнаты</p>
         <div className="qm-title" style={{ letterSpacing: 10, fontSize: '3rem', margin: '0.2rem 0 1rem' }}>
           {session.code}
+        </div>
+        <div className="qm-qr qm-qr-lg" style={{ margin: '0 auto 1rem', maxWidth: 230 }}>
+          <QRCodeSVG value={joinUrl} size={190} bgColor="#fffaf0" fgColor="#2b2118" />
+          <div className="qm-small">Сканируйте, чтобы войти</div>
         </div>
         <div className="qm-grid">
           {participants.map((p) => (

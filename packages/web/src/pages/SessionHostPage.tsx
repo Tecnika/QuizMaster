@@ -10,8 +10,10 @@ import {
   query,
   updateDoc,
 } from 'firebase/firestore';
+import { QRCodeSVG } from 'qrcode.react';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
+import { useCountdown } from '../lib/useCountdown';
 import { IconCat, IconCheck, IconGavel } from '../components/icons';
 import {
   MILLIONAIRE_LADDER,
@@ -20,6 +22,7 @@ import {
   buildBoard,
   emptyTurn,
   fiftyFiftyOptions,
+  formatCountdown,
   prizeFor,
   resolveMillionaireAnswer,
   type Answer,
@@ -65,6 +68,10 @@ export default function SessionHostPage() {
   const [bidInput, setBidInput] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState<'players' | 'screen' | null>(null);
+
+  const timer = session?.timer ?? null;
+  const timeLeft = useCountdown(timer?.endsAt);
+  const timerLimit = game?.settings?.timeLimitSeconds ?? 60;
 
   const sessionRef = useMemo(
     () => (sessionId ? doc(db, 'sessions', sessionId) : null),
@@ -135,6 +142,15 @@ export default function SessionHostPage() {
     }
   };
 
+  const startTimer = async () => {
+    if (!timerLimit) return;
+    await patchSession({ timer: { endsAt: Date.now() + timerLimit * 1000, duration: timerLimit } });
+  };
+
+  const stopTimer = async () => {
+    await patchSession({ timer: null });
+  };
+
   const addParticipant = async () => {
     if (!sessionId || !newName.trim()) return;
     setError('');
@@ -170,6 +186,7 @@ export default function SessionHostPage() {
         patch.turn = null;
         patch.publicQuestion = null;
       }
+      patch.timer = null;
       await patchSession(patch);
     } catch (e: any) {
       setError(e?.message || 'Не удалось начать игру');
@@ -193,6 +210,7 @@ export default function SessionHostPage() {
       publicQuestion: toPublic(questions[0]),
       revealedCorrectIndex: null,
       revealedAnswer: null,
+      timer: null,
     });
   };
 
@@ -250,6 +268,7 @@ export default function SessionHostPage() {
       publicQuestion: toPublic(q),
       revealedCorrectIndex: null,
       revealedAnswer: null,
+      timer: null,
     });
   };
 
@@ -320,6 +339,7 @@ export default function SessionHostPage() {
       catRecipientId: null,
       auctionWinnerId: null,
       auctionBid: null,
+      timer: null,
     };
     if (q.kind === 'cat') {
       await patchSession({
@@ -405,6 +425,7 @@ export default function SessionHostPage() {
       catRecipientId: null,
       auctionWinnerId: null,
       auctionBid: null,
+      timer: null,
     });
   };
 
@@ -492,6 +513,16 @@ export default function SessionHostPage() {
             </div>
             <div className="qm-divider" />
             <p className="qm-small">Ссылка для игроков: <code>{joinUrl}</code></p>
+            <div className="qm-grid qm-grid-2 qm-mt">
+              <div className="qm-qr">
+                <QRCodeSVG value={joinUrl} size={140} bgColor="#fffaf0" fgColor="#2b2118" />
+                <div className="qm-small">Игрокам</div>
+              </div>
+              <div className="qm-qr">
+                <QRCodeSVG value={screenUrl} size={140} bgColor="#fffaf0" fgColor="#2b2118" />
+                <div className="qm-small">Экран</div>
+              </div>
+            </div>
             <button className="qm-btn qm-btn-gold qm-btn-lg qm-mt" onClick={() => void startGame()} disabled={participants.length === 0}>
               Начать игру
             </button>
@@ -592,6 +623,19 @@ export default function SessionHostPage() {
                       <div className="qm-inline">
                         {turn.chosenIndex != null && (
                           <button className="tv-icon-btn" onClick={() => void patchSession({ turn: { ...turn, chosenIndex: null } })}>Сбросить</button>
+                        )}
+                        {timerLimit > 0 && (
+                          <button className="tv-icon-btn" onClick={() => void startTimer()}>
+                            {timer ? 'Перезапустить таймер' : `Таймер ${timerLimit}с`}
+                          </button>
+                        )}
+                        {timer && (
+                          <button className="tv-icon-btn" onClick={() => void stopTimer()}>Стоп</button>
+                        )}
+                        {timeLeft != null && (
+                          <span className={`tv-timer-small${timeLeft === 0 ? ' warning' : ''}`}>
+                            {timeLeft > 0 ? formatCountdown(timeLeft) : 'Время вышло'}
+                          </span>
                         )}
                         <button className="tv-icon-btn" onClick={() => void takeMoney()}>Забрать деньги</button>
                         <button className="tv-icon-btn" onClick={() => void revealMillionaire()}>Показать ответ</button>
@@ -743,6 +787,19 @@ export default function SessionHostPage() {
                 <div className="svoya-answer-box">Ответ: {session.revealedAnswer}</div>
               ) : (
                 <button className="tv-icon-btn" onClick={() => void revealSvoya()}>Показать ответ</button>
+              )}
+              {timerLimit > 0 && (
+                <button className="tv-icon-btn" onClick={() => void startTimer()}>
+                  {timer ? 'Перезапустить таймер' : `Таймер ${timerLimit}с`}
+                </button>
+              )}
+              {timer && (
+                <button className="tv-icon-btn" onClick={() => void stopTimer()}>Стоп</button>
+              )}
+              {timeLeft != null && (
+                <span className={`tv-timer-small${timeLeft === 0 ? ' warning' : ''}`}>
+                  {timeLeft > 0 ? formatCountdown(timeLeft) : 'Время вышло'}
+                </span>
               )}
               <button className="tv-icon-btn" onClick={() => void closeCell()}>Закрыть вопрос</button>
             </div>

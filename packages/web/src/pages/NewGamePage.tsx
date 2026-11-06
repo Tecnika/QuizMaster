@@ -32,8 +32,8 @@ export default function NewGamePage() {
     try {
       const now = new Date().toISOString();
       const settings = type === 'millionaire'
-        ? { ladder: MILLIONAIRE_LADDER, safeHavens: MILLIONAIRE_SAFE_HAVENS }
-        : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false };
+        ? { ladder: MILLIONAIRE_LADDER, safeHavens: MILLIONAIRE_SAFE_HAVENS, timeLimitSeconds: 60 }
+        : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false, timeLimitSeconds: 60 };
       const ref = await addDoc(collection(db, 'games'), {
         title: title.trim(),
         description: description.trim(),

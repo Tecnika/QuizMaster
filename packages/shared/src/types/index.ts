@@ -29,6 +29,8 @@ export interface GameSettings {
   allowSpecial?: boolean;
   /** Проводить финальный раунд. */
   finalRound?: boolean;
+  /** Лимит времени на вопрос в секундах (0 — без ограничения). */
+  timeLimitSeconds?: number;
 }
 
 export interface Game {
@@ -135,6 +137,8 @@ export interface Session {
   /** «Аукцион»: победитель и ставка. */
   auctionWinnerId?: string | null;
   auctionBid?: number | null;
+  /** Таймер текущего вопроса. */
+  timer?: { endsAt: number; duration: number } | null;
   finalStage?: {
     active: boolean;
     themes: string[];

@@ -145,6 +145,22 @@ export default function GameEditorPage() {
             <input className="qm-input" value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
         </div>
+        <div className="qm-row">
+          <div className="qm-field">
+            <label className="qm-label">Лимит времени на вопрос</label>
+            <select
+              className="qm-select"
+              value={game.settings?.timeLimitSeconds ?? 60}
+              onChange={(e) => void updateSettings({ ...(game.settings || {}), timeLimitSeconds: Number(e.target.value) })}
+            >
+              <option value={0}>без ограничения</option>
+              <option value={30}>30 секунд</option>
+              <option value={60}>60 секунд</option>
+              <option value={90}>90 секунд</option>
+              <option value={120}>120 секунд</option>
+            </select>
+          </div>
+        </div>
         <div className="qm-inline">
           <button className="qm-btn qm-btn-ghost" onClick={() => void saveMeta()} disabled={saving}>
             {saving ? 'Сохраняем…' : 'Сохранить название'}
