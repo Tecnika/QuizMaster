@@ -50,9 +50,14 @@ export function fiftyFiftyOptions(correctIndex: number, count = 4, random: () =>
   return [correctIndex, pick].sort((a, b) => a - b);
 }
 
+export function newTurnId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function emptyTurn(participantId: string): MillionaireTurn {
   return {
     participantId,
+    turnId: newTurnId(),
     questionIndex: 0,
     status: 'answering',
     lifelines: { fifty: false, audience: false, phone: false },

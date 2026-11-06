@@ -121,9 +121,10 @@ export default function SessionHostPage() {
   const turn = session?.turn ?? null;
   const turnAnswers = useMemo(() => {
     const qid = session?.publicQuestion?.id;
+    const turnId = session?.turn?.turnId;
     if (!qid) return [];
-    return answers.filter((a) => a.questionId === qid);
-  }, [answers, session?.publicQuestion?.id]);
+    return answers.filter((a) => a.questionId === qid && (!turnId || a.turnId === turnId));
+  }, [answers, session?.publicQuestion?.id, session?.turn?.turnId]);
 
   const patchSession = async (patch: Record<string, unknown>) => {
     if (!sessionRef) return;

@@ -68,7 +68,11 @@ export default function PlayerPage() {
     if (!question?.id) return;
     setError('');
     try {
-      await submitAnswer(sessionId, claim, { ...payload, questionId: question.id });
+      await submitAnswer(sessionId, claim, {
+        ...payload,
+        questionId: question.id,
+        turnId: turn?.turnId ?? null,
+      });
       setSent(true);
     } catch {
       setError('Не удалось отправить ответ. Попробуйте ещё раз.');

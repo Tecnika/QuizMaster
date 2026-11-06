@@ -111,11 +111,12 @@ export async function claimParticipant(sessionId: string, participantId: string)
 export async function submitAnswer(
   sessionId: string,
   claim: StoredClaim,
-  payload: { questionId: string; type: Answer['type']; choice?: number; text?: string },
+  payload: { questionId: string; turnId?: string | null; type: Answer['type']; choice?: number; text?: string },
 ): Promise<void> {
   await addDoc(collection(db, 'sessions', sessionId, 'answers'), {
     participantId: claim.participantId,
     questionId: payload.questionId,
+    turnId: payload.turnId ?? null,
     token: claim.token,
     type: payload.type,
     choice: payload.choice ?? null,

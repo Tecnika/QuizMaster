@@ -88,6 +88,8 @@ export interface Lifelines {
 
 export interface MillionaireTurn {
   participantId: string;
+  /** Идентификатор конкретного прохода — чтобы не смешивать ответы разных попыток. */
+  turnId: string;
   questionIndex: number;
   status: MillionaireTurnStatus;
   lifelines: Lifelines;
@@ -146,6 +148,8 @@ export interface Answer {
   id: string;
   participantId: string;
   questionId: string;
+  /** Для «Миллионера» — привязка к проходу. */
+  turnId?: string | null;
   type: 'choice' | 'buzz' | 'text';
   choice?: number;
   text?: string;
