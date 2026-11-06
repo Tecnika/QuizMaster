@@ -79,6 +79,14 @@ export default function PlayerPage() {
     ? answerOptions.filter((o) => turn.fiftyOptions!.includes(o.index))
     : answerOptions;
 
+  const catHidden = question?.kind === 'cat' && !session.catRecipientId;
+  const auctionHidden = question?.kind === 'auction' && session.auctionBid == null;
+  const catForOther = question?.kind === 'cat' && Boolean(session.catRecipientId) && session.catRecipientId !== me.id;
+  const auctionForOther = question?.kind === 'auction' && Boolean(session.auctionWinnerId) && session.auctionWinnerId !== me.id;
+  const canAnswerSvoya = Boolean(question) && !catHidden && !auctionHidden && !catForOther && !auctionForOther;
+  const catName = participants.find((p) => p.id === session.catRecipientId)?.name;
+  const auctionName = participants.find((p) => p.id === session.auctionWinnerId)?.name;
+
   return (
     <div className="player-screen">
       <div className="player-head">
@@ -183,59 +191,72 @@ export default function PlayerPage() {
               <div className="player-question">
                 <div className="qm-small" style={{ color: '#ffd447', marginBottom: 4 }}>
                   {question.theme} · {question.value}
+                  {question.kind === 'cat' ? ' · кот в мешке' : ''}
+                  {question.kind === 'auction' ? ' · аукцион' : ''}
                 </div>
                 {question.text}
               </div>
 
-              {!session.revealedAnswer && (
-                <>
-                  {question.options?.length ? (
-                    <div className="player-answers">
-                      {question.options.map((text, index) => (
-                        <button
-                          key={index}
-                          className={`player-answer${selected === index ? ' selected' : ''}`}
-                          disabled={sent}
-                          onClick={() => setSelected(index)}
-                        >
-                          <b style={{ color: '#ffd447' }}>{'ABCD'[index]}</b> {text}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {question.options?.length ? (
-                    <button
-                      className="qm-btn qm-btn-gold qm-btn-block qm-btn-lg qm-mt"
-                      disabled={selected === null || sent}
-                      onClick={() => selected !== null && void send({ type: 'choice', choice: selected })}
-                    >
-                      {sent ? 'Ответ отправлен' : 'Ответить'}
-                    </button>
-                  ) : (
-                    <button
-                      className="player-buzz"
-                      disabled={sent || Boolean(session.buzzedParticipantId)}
-                      onClick={() => void send({ type: 'buzz' })}
-                    >
-                      {sent ? 'Нажатие отправлено' : 'Ответить!'}
-                    </button>
-                  )}
-
-                  {session.buzzedParticipantId && (
-                    <div className="player-status">
-                      {session.buzzedParticipantId === me.id
-                        ? 'Вы нажали первым — отвечайте!'
-                        : `Отвечает: ${participants.find((p) => p.id === session.buzzedParticipantId)?.name ?? 'соперник'}`}
-                    </div>
-                  )}
-                </>
+              {catHidden && <div className="player-status">Ведущий решает, кому передать кота.</div>}
+              {auctionHidden && <div className="player-status">Идёт аукцион. Ведущий разыгрывает вопрос.</div>}
+              {catForOther && <div className="player-status">Кот в мешке передан: <b>{catName}</b>.</div>}
+              {auctionForOther && (
+                <div className="player-status">
+                  Аукцион: отвечает <b>{auctionName}</b> · ставка {session.auctionBid}.
+                </div>
               )}
 
-              {session.revealedAnswer && (
+              {session.revealedAnswer ? (
                 <div className="player-status">
                   Правильный ответ: <b style={{ color: '#7dffb0' }}>{session.revealedAnswer}</b>
                 </div>
+              ) : (
+                canAnswerSvoya && (
+                  <>
+                    {question.options?.length ? (
+                      <div className="player-answers">
+                        {question.options.map((text, index) => (
+                          <button
+                            key={index}
+                            className={`player-answer${selected === index ? ' selected' : ''}`}
+                            disabled={sent}
+                            onClick={() => setSelected(index)}
+                          >
+                            <b style={{ color: '#ffd447' }}>{'ABCD'[index]}</b> {text}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {question.options?.length ? (
+                      <button
+                        className="qm-btn qm-btn-gold qm-btn-block qm-btn-lg qm-mt"
+                        disabled={selected === null || sent}
+                        onClick={() => selected !== null && void send({ type: 'choice', choice: selected })}
+                      >
+                        {sent ? 'Ответ отправлен' : 'Ответить'}
+                      </button>
+                    ) : (
+                      <button
+                        className="player-buzz"
+                        disabled={sent || Boolean(session.buzzedParticipantId)}
+                        onClick={() => void send({ type: 'buzz' })}
+                      >
+                        {sent ? 'Нажатие отправлено' : 'Ответить!'}
+                      </button>
+                    )}
+
+                    {session.buzzedParticipantId && (
+                      <div className="player-status">
+                        {session.buzzedParticipantId === me.id
+                          ? (session.catRecipientId === me.id || session.auctionWinnerId === me.id
+                            ? 'Вы отвечаете!'
+                            : 'Вы нажали первым — отвечайте!')
+                          : `Отвечает: ${participants.find((p) => p.id === session.buzzedParticipantId)?.name ?? 'соперник'}`}
+                      </div>
+                    )}
+                  </>
+                )
               )}
             </>
           )}

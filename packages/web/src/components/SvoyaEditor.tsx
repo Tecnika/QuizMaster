@@ -124,13 +124,9 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
             />
             «Кот в мешке» и «Аукцион»
           </label>
-          <label className="qm-inline" style={{ cursor: 'pointer' }}>
-            <input
-              type="checkbox" className="qm-radio"
-              checked={settings.finalRound === true}
-              onChange={(e) => void onUpdateSettings({ ...settings, finalRound: e.target.checked })}
-            />
-            Финальный раунд
+          <label className="qm-inline" style={{ cursor: 'not-allowed', opacity: 0.6 }} title="Появится в следующем обновлении">
+            <input type="checkbox" className="qm-radio" disabled checked={false} />
+            Финальный раунд (скоро)
           </label>
         </div>
         <div className="qm-divider" />

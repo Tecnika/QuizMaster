@@ -128,6 +128,11 @@ export interface Session {
   board?: SvoyaCell[] | null;
   activeCellId?: string | null;
   buzzedParticipantId?: string | null;
+  /** «Кот в мешке»: кому передан вопрос. */
+  catRecipientId?: string | null;
+  /** «Аукцион»: победитель и ставка. */
+  auctionWinnerId?: string | null;
+  auctionBid?: number | null;
   finalStage?: {
     active: boolean;
     themes: string[];

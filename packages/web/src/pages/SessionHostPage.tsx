@@ -61,6 +61,7 @@ export default function SessionHostPage() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [newName, setNewName] = useState('');
+  const [bidInput, setBidInput] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -301,13 +302,60 @@ export default function SessionHostPage() {
     const q = questions.find((x) => x.id === cell.questionId);
     if (!q) return;
     const nextBoard = board.map((c) => (c.questionId === cell.questionId ? { ...c, used: true } : c));
-    await patchSession({
+    const base = {
       board: nextBoard,
       activeCellId: cell.questionId,
-      publicQuestion: toPublic(q),
       revealedCorrectIndex: null,
       revealedAnswer: null,
       buzzedParticipantId: null,
+      catRecipientId: null,
+      auctionWinnerId: null,
+      auctionBid: null,
+    };
+    if (q.kind === 'cat') {
+      await patchSession({
+        ...base,
+        publicQuestion: {
+          id: q.id,
+          text: 'Кот в мешке! Ведущий передаёт вопрос сопернику.',
+          theme: q.theme,
+          value: q.value,
+          kind: 'cat',
+        },
+      });
+    } else if (q.kind === 'auction') {
+      await patchSession({
+        ...base,
+        publicQuestion: {
+          id: q.id,
+          text: 'Аукцион! Разыграйте вопрос среди участников.',
+          theme: q.theme,
+          value: q.value,
+          kind: 'auction',
+        },
+      });
+    } else {
+      await patchSession({ ...base, publicQuestion: toPublic(q) });
+    }
+  };
+
+  const assignCat = async (p: Participant) => {
+    if (!currentQuestion) return;
+    await patchSession({
+      catRecipientId: p.id,
+      buzzedParticipantId: p.id,
+      publicQuestion: toPublic(currentQuestion),
+    });
+  };
+
+  const startAuction = async (p: Participant) => {
+    if (!currentQuestion) return;
+    const bid = Number(bidInput) || currentQuestion.value || 0;
+    await patchSession({
+      auctionWinnerId: p.id,
+      auctionBid: bid,
+      buzzedParticipantId: p.id,
+      publicQuestion: toPublic(currentQuestion),
     });
   };
 
@@ -321,7 +369,10 @@ export default function SessionHostPage() {
 
   const applyScore = async (p: Participant, correct: boolean) => {
     if (!currentQuestion) return;
-    const value = currentQuestion.value ?? session?.publicQuestion?.value ?? 0;
+    const nominal = currentQuestion.value ?? session?.publicQuestion?.value ?? 0;
+    const value = currentQuestion.kind === 'auction' && session?.auctionBid != null
+      ? session.auctionBid
+      : nominal;
     const score = applySvoyaScore(p.score ?? 0, value, correct);
     if (!sessionId) return;
     await updateDoc(doc(db, 'sessions', sessionId, 'participants', p.id), { score });
@@ -342,11 +393,22 @@ export default function SessionHostPage() {
       revealedCorrectIndex: null,
       revealedAnswer: null,
       buzzedParticipantId: null,
+      catRecipientId: null,
+      auctionWinnerId: null,
+      auctionBid: null,
     });
   };
 
   const totalCells = board.length;
   const usedCells = board.filter((c) => c.used).length;
+  const publicQ = session?.publicQuestion;
+  const svoyaReady = Boolean(
+    publicQ && (
+      (publicQ.kind !== 'cat' && publicQ.kind !== 'auction') ||
+      (publicQ.kind === 'cat' && session?.catRecipientId) ||
+      (publicQ.kind === 'auction' && session?.auctionBid != null)
+    ),
+  );
 
   if (!session) {
     return <div className="tv tv-millionaire"><div className="tv-top"><span className="tv-logo">Загрузка…</span></div></div>;
@@ -612,7 +674,42 @@ export default function SessionHostPage() {
             </div>
           )}
 
-          {session.publicQuestion && (
+          {session.publicQuestion?.kind === 'cat' && !session.catRecipientId && (
+            <div className="svoya-actions">
+              <div className="svoya-round-title" style={{ flexBasis: '100%' }}>Кому передаём кота?</div>
+              {participants.map((p) => (
+                <button key={p.id} className="tv-icon-btn" onClick={() => void assignCat(p)}>{p.name}</button>
+              ))}
+            </div>
+          )}
+
+          {session.publicQuestion?.kind === 'auction' && session.auctionBid == null && (
+            <div className="svoya-actions">
+              <div className="svoya-round-title" style={{ flexBasis: '100%' }}>Аукцион: победитель и ставка</div>
+              <input
+                className="qm-input" style={{ maxWidth: 140 }} value={bidInput}
+                onChange={(e) => setBidInput(e.target.value)}
+                placeholder={String(session.publicQuestion.value ?? 0)}
+              />
+              {participants.map((p) => (
+                <button key={p.id} className="tv-icon-btn" onClick={() => void startAuction(p)}>{p.name}</button>
+              ))}
+            </div>
+          )}
+
+          {session.publicQuestion?.kind === 'cat' && session.catRecipientId && (
+            <div className="svoya-round-title">
+              Кот у: {participants.find((p) => p.id === session.catRecipientId)?.name}
+            </div>
+          )}
+
+          {session.publicQuestion?.kind === 'auction' && session.auctionBid != null && (
+            <div className="svoya-round-title">
+              Ставка: {session.auctionBid} · отвечает {participants.find((p) => p.id === session.auctionWinnerId)?.name}
+            </div>
+          )}
+
+          {session.publicQuestion && svoyaReady && (
             <div className="svoya-actions">
               {session.revealedAnswer ? (
                 <div className="svoya-answer-box">Ответ: {session.revealedAnswer}</div>
@@ -623,7 +720,7 @@ export default function SessionHostPage() {
             </div>
           )}
 
-          {session.publicQuestion && (
+          {session.publicQuestion && svoyaReady && (
             <>
               <div className="svoya-round-title">Нажатия</div>
               <div className="qm-inline" style={{ justifyContent: 'center' }}>
