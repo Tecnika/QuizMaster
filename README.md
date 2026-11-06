@@ -1,39 +1,53 @@
-# QuizMaster Constructor 🧠
+# QuizMaster Constructor
 
-[![Deploy](https://github.com/Tecnika/QuizMaster/actions/workflows/deploy.yml/badge.svg)](https://github.com/Tecnika/QuizMaster/actions/workflows/deploy.yml)
+Платформа для проведения викторин в двух форматах:
 
-Платформа для создания и проведения интеллектуальных игр — **«Кто хочет стать миллионером?»** и **«Своя игра»**.
+- **«Кто хочет стать миллионером?»** — 15 вопросов, лестница сумм, несгораемые рубежи, подсказки.
+- **«Своя игра»** — табло тем и стоимостей, раунды, «Кот в мешке», «Аукцион», финал.
 
-### Стек
+Авторы создают игры и запускают сессии. Игрокам аккаунт не нужен: они входят по коду комнаты, выбирают имя и отвечают со своих устройств.
 
-- **Фронтенд**: Vite 4 + React 18, Firebase Auth, Firestore realtime
-- **Бэкенд**: Firestore + security rules
-- **Хостинг**: GitHub Pages (статический SPA) + Firebase (auth, firestore)
-- **CI/CD**: GitHub Actions
+## Стек
 
-### Быстрый старт
+- Vite 4 + React 18 + TypeScript
+- Firebase Auth (авторы) + Firestore (Spark)
+- GitHub Pages
 
-```bash
-git clone https://github.com/Tecnika/QuizMaster.git
-cd QuizMaster
+## Быстрый старт
+
+```powershell
 npm install
-npm run build
+npm run dev -w packages/web
+# http://localhost:5173/QuizMaster/
 ```
 
-### Документация
+Сборка:
 
-- [Инструкция по деплою](DEPLOY.md) — Firebase + GitHub Pages + настройка
-- [AGENTS.md](AGENTS.md) — архитектура и команды разработчика
-- [CHANGELOG.md](CHANGELOG.md) — история изменений
+```powershell
+npm run build -w packages/shared
+npm run build -w packages/web
+```
 
-### Структура
+Тесты:
+
+```powershell
+npm run test:unit
+```
+
+Деплой правил Firestore:
+
+```powershell
+firebase deploy --only firestore
+```
+
+Публикация фронтенда — автоматически через GitHub Actions при push в `master` (ветка `gh-pages`).
+
+## Структура
 
 ```
-QuizMaster/
-├── packages/
-│   ├── shared/     # Типы + утилиты (scoring)
-│   └── web/        # React SPA (Vite)
-├── .github/workflows # CI/CD
-├── firestore.rules   # Security rules
-└── firebase.json     # Firebase config
+packages/shared   типы и игровая логика + unit-тесты
+packages/web      React SPA
+firestore.rules   правила безопасности
 ```
+
+Подробности для разработчика — в `AGENTS.md`.

@@ -4,48 +4,68 @@
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start all packages in dev mode |
-| `npm run build` | Build all packages |
-| `npm run test` | Run all tests |
-| `npm run test:unit` | Run unit tests only |
-| `npm run lint` | Run ESLint across all packages |
-| `firebase deploy --only firestore` | Deploy Firestore rules + indexes |
+| `npm run dev -w packages/web` | Dev-сервер (http://localhost:5173/QuizMaster/) |
+| `npm run build -w packages/shared` | Сборка общих типов и логики |
+| `npm run build -w packages/web` | Сборка SPA |
+| `npm run test:unit` | Unit-тесты (Jest) |
+| `firebase deploy --only firestore` | Деплой правил и индексов Firestore |
+| `npx gh-pages --dist packages/web/dist --dotfiles --no-history` | Ручной деплой фронтенда (запасной вариант) |
+
+CI: `.github/workflows/deploy.yml` — на push в `master` запускает тесты, сборку и публикацию на GitHub Pages.
 
 ## Architecture
 
-- **Monorepo** with npm workspaces
-- `packages/shared` — types and utilities shared between web and functions
-- `packages/web` — Vite 4 + React 18 SPA, Firebase Client SDK (v9)
-- **Backend**: Firestore + security rules (no Cloud Functions)
-- **Hosting**: GitHub Pages (static SPA) + Firebase (auth, firestore)
+- **Monorepo** с npm workspaces.
+- `packages/shared` — типы, игровая логика (лестница, счёт, табло, коды), unit-тесты.
+- `packages/web` — Vite 4 + React 18 + TypeScript SPA.
+- **Backend:** Firebase Auth (только авторы) + Firestore. Cloud Functions не используем (Spark).
+- **Hosting:** GitHub Pages, базовый путь `/QuizMaster/`.
+- **Routing:** `BrowserRouter basename="/QuizMaster"`; прямые ссылки — через `404.html` + `sessionStorage`.
 
-## Data Flow
+## Data model
 
-1. User actions trigger direct Firestore reads/writes from the browser
-2. Firestore security rules validate access and data integrity
-3. Client subscribes to Firestore via `onSnapshot` for realtime updates
-4. Player joins via join code → reads session doc → submits answers
+```
+users/{uid}                        login, email, role, createdAt
+games/{gameId}                     title, description, type, authorId, status, settings
+games/{gameId}/questions/{qid}     вопрос (правильный ответ — только для автора)
+joinCodes/{code}                   sessionId, hostId
+sessions/{sessionId}               gameId, gameType, hostId, code, status, publicQuestion,
+                                   revealedCorrectIndex, revealedAnswer, turn, board, ...
+sessions/{sid}/participants/{pid}  name, score, color
+sessions/{sid}/claims/{pid}        публичная метка «имя занято»
+sessions/{sid}/tokens/{pid}        секретный токен игрока (читает только ведущий)
+sessions/{sid}/answers/{aid}      participantId, questionId, token, type, choice, text
+```
 
-## Collections
+## Security model
 
-| Collection | Purpose | Access |
-|------------|---------|--------|
-| `users` | User profiles | Read/write own |
-| `games` | Game definitions | CRUD by author |
-| `games/{id}/questions` | Questions per game | CRUD by game author |
-| `sessions` | Live game sessions | Created by host |
-| `teams` | Teams per session | Created by players |
-| `answers` | Submitted answers | Write only |
+- Автор создаёт игры/вопросы и проводит сессии. Вопросы **не читаются игроками** — в них правильные ответы.
+- Игроки **не проходят Firebase Auth**. Код комнаты → `joinCodes` → `sessionId` → выбор имени → локальный токен.
+- `tokens` создаётся один раз; `answers` создаётся только с совпадающим токеном. Ответы читает только ведущий.
+- Публичный снимок вопроса в сессии не содержит правильного ответа; ведущий раскрывает его отдельно.
+- Правила покрыты сквозным REST-тестом (17 проверок).
 
-## Key Modules
+## Design
+
+- Сайт: настольная игра — дерево, бумага, карточки, фишки, тёплые цвета (`src/global.css`).
+- «Миллионер»: тёмно-синий/фиолетовый зал, золото, лестница, варианты-плитки (`.tv-millionaire`).
+- «Своя игра»: синий зал, золотое табло (`.tv-svoya`).
+- Экраны игроков — отдельный мобильный стиль (`.player-screen`).
+
+## Key modules
 
 | Module | File | Purpose |
 |--------|------|---------|
-| Auth | `packages/web/src/lib/auth.tsx` | Firebase Auth + context |
-| Firebase | `packages/web/src/lib/firebase.ts` | Firebase init + exports |
-| Scoring | `packages/shared/src/utils/scoring.ts` | Score calculation logic |
-| Firestore rules | `firestore.rules` | Security rules (all logic) |
+| Auth | `packages/web/src/lib/auth.tsx` | Firebase Auth авторов, логин → email |
+| Firebase | `packages/web/src/lib/firebase.ts` | Инициализация |
+| Sessions | `packages/web/src/lib/session.ts` | Код, claim, токен, ответы, подписки |
+| Millionaire logic | `packages/shared/src/utils/millionaire.ts` | Лестница, несгораемые, 50/50 |
+| Svoya logic | `packages/shared/src/utils/svoya.ts` | Табло, очки, финал |
+| Codes | `packages/shared/src/utils/code.ts` | Коды комнат и токены |
+| Rules | `firestore.rules` | Вся безопасность |
+| Design | `packages/web/src/global.css` | Настольная и ТВ-стилистика |
 
-## Env Variables
+## Env variables
 
-- `packages/web/.env.local` — VITE_FIREBASE_* keys for Firebase Client SDK
+- `packages/web/.env.local` — локальные ключи Firebase (gitignored).
+- `packages/web/.env.production` — публичный Firebase-конфиг для CI (можно коммитить).
