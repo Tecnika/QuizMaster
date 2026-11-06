@@ -630,6 +630,7 @@ export default function SessionHostPage() {
             return (
               <div key={round}>
                 <div className="svoya-round-title">Раунд {round}</div>
+                <div style={{ overflowX: 'auto' }}>
                 <table className="svoya-board">
                   <thead>
                     <tr>
@@ -660,6 +661,7 @@ export default function SessionHostPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             );
           })}

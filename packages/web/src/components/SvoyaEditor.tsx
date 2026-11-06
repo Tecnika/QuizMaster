@@ -111,7 +111,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
   };
 
   return (
-    <div>
+    <div className="qm-editor">
       <div className="qm-card">
         <h2 className="qm-card-title">Настройки «Своей игры»</h2>
         <p className="qm-card-muted">Раунды и стоимости заданы классическими. Можно включить спецвопросы и финал.</p>

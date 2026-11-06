@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <div className="qm-container-narrow" style={{ margin: '0 auto' }}>
-      <div className="qm-card">
+      <div className="qm-card" style={{ maxWidth: 440, margin: '0 auto' }}>
         <div className="qm-eyebrow">С возвращением</div>
         <h1 className="qm-title">Вход</h1>
         <p className="qm-subtitle qm-mb">Войдите, чтобы создавать игры и проводить сессии.</p>

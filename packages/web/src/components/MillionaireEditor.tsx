@@ -13,7 +13,7 @@ export default function MillionaireEditor({ gameId, questions }: Props) {
   const filled = questions.filter((q) => q.text && q.options && q.options.length === 4).length;
 
   return (
-    <div>
+    <div className="qm-editor">
       <div className="qm-card">
         <div className="qm-page-head" style={{ marginBottom: 0 }}>
           <div>

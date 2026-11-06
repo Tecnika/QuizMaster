@@ -47,7 +47,7 @@ export default function RegisterPage() {
 
   return (
     <div className="qm-container-narrow" style={{ margin: '0 auto' }}>
-      <div className="qm-card">
+      <div className="qm-card" style={{ maxWidth: 440, margin: '0 auto' }}>
         <div className="qm-eyebrow">Новый автор</div>
         <h1 className="qm-title">Регистрация</h1>
         <p className="qm-subtitle qm-mb">Аккаунт нужен только тем, кто создаёт игры.</p>
