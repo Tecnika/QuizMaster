@@ -51,6 +51,10 @@ export interface Question {
   text: string;
   answer: string;
   comment?: string;
+  /** Ссылка на картинку к вопросу. */
+  imageUrl?: string;
+  /** Ссылка на аудио к вопросу. */
+  audioUrl?: string;
 
   /** «Миллионер» */
   options?: string[];
@@ -69,6 +73,8 @@ export interface PublicQuestion {
   id: string;
   text: string;
   options?: string[];
+  imageUrl?: string;
+  audioUrl?: string;
   round?: number;
   theme?: string;
   value?: number;

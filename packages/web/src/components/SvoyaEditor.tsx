@@ -32,6 +32,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
   const [text, setText] = useState('');
   const [answer, setAnswer] = useState('');
   const [comment, setComment] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -49,6 +51,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
     setText('');
     setAnswer('');
     setComment('');
+    setImageUrl('');
+    setAudioUrl('');
     setKind('normal');
     setError('');
   };
@@ -73,6 +77,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
       text: text.trim(),
       answer: answer.trim(),
       comment: comment.trim(),
+      imageUrl: imageUrl.trim(),
+      audioUrl: audioUrl.trim(),
     };
     try {
       if (editingId) {
@@ -100,6 +106,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
     setText(q.text ?? '');
     setAnswer(q.answer ?? '');
     setComment(q.comment ?? '');
+    setImageUrl(q.imageUrl ?? '');
+    setAudioUrl(q.audioUrl ?? '');
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -215,6 +223,26 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
             />
           </div>
         </div>
+        <div className="qm-row">
+          <div className="qm-field">
+            <label className="qm-label">Картинка (URL)</label>
+            <input
+              className="qm-input" value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://…/image.jpg"
+            />
+          </div>
+          <div className="qm-field">
+            <label className="qm-label">Аудио (URL)</label>
+            <input
+              className="qm-input" value={audioUrl}
+              onChange={(e) => setAudioUrl(e.target.value)}
+              placeholder="https://…/audio.mp3"
+            />
+          </div>
+        </div>
+        {imageUrl && <img className="qm-media-preview" src={imageUrl} alt="" />}
+        {audioUrl && <audio className="qm-audio-preview" controls src={audioUrl} />}
 
         {error && <p className="qm-danger-text">{error}</p>}
         <div className="qm-inline">
@@ -294,6 +322,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
                           <span className={`qm-badge ${q.kind === 'cat' ? 'qm-badge-gold' : q.kind === 'auction' ? 'qm-badge-red' : ''}`}>
                             {kindLabel[q.kind ?? 'normal']}
                           </span>
+                          {(q.imageUrl || q.audioUrl) && <span className="qm-badge qm-badge-blue">медиа</span>}
                         </div>
                         <div className="qm-inline">
                           <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => edit(q)}>Изменить</button>

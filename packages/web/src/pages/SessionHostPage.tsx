@@ -40,6 +40,8 @@ const COLORS = ['#c9a227', '#2e6b52', '#a04457', '#3a5ba8', '#8a5a2b', '#5a3d8c'
 function toPublic(q: Question): PublicQuestion {
   const out: PublicQuestion = { id: q.id, text: q.text };
   if (q.options) out.options = q.options;
+  if (q.imageUrl) out.imageUrl = q.imageUrl;
+  if (q.audioUrl) out.audioUrl = q.audioUrl;
   if (q.round != null) out.round = q.round;
   if (q.theme) out.theme = q.theme;
   if (q.value != null) out.value = q.value;
@@ -561,6 +563,12 @@ export default function SessionHostPage() {
                 {session.publicQuestion && (
                   <>
                     <div className="millionaire-question">{session.publicQuestion.text}</div>
+                    {session.publicQuestion.imageUrl && (
+                      <img className="tv-media" src={session.publicQuestion.imageUrl} alt="" />
+                    )}
+                    {session.publicQuestion.audioUrl && (
+                      <audio className="tv-audio" controls src={session.publicQuestion.audioUrl} />
+                    )}
                     <div className="millionaire-answers">
                       {(session.publicQuestion.options ?? []).map((text, i) => {
                         const hidden = turn.fiftyOptions?.length ? !turn.fiftyOptions.includes(i) : false;
@@ -743,6 +751,12 @@ export default function SessionHostPage() {
               </span>
               {session.publicQuestion.text}
             </div>
+          )}
+          {session.publicQuestion?.imageUrl && (
+            <img className="tv-media" src={session.publicQuestion.imageUrl} alt="" />
+          )}
+          {session.publicQuestion?.audioUrl && (
+            <audio className="tv-audio" controls src={session.publicQuestion.audioUrl} />
           )}
           {currentQuestion && <div className="tv-answer-key">Ответ ведущего: {currentQuestion.answer}</div>}
 

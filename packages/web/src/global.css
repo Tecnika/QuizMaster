@@ -227,6 +227,8 @@ p { line-height: 1.55; }
 
 /* ---------- Редактор ---------- */
 .qm-editor { margin-top: 1rem; }
+.qm-media-preview { display: block; max-width: 220px; max-height: 130px; margin: 0.5rem 0; border-radius: 8px; object-fit: contain; }
+.qm-audio-preview { display: block; width: 100%; max-width: 420px; margin: 0.5rem 0; }
 .qm-editor > .qm-editor-slot:first-of-type { margin-top: 0.75rem; }
 .qm-editor-slot { border: 1.5px dashed #cbb58f; border-radius: 12px; padding: 0.9rem; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.35); }
 .qm-editor-slot.done { border-style: solid; border-color: #9cc7ac; background: #f2faf4; }
@@ -253,6 +255,8 @@ p { line-height: 1.55; }
 .tv-timer-small.warning { color: #ff5a6a; }
 .tv-svoya .tv-timer, .tv-svoya .tv-timer-small { color: #ffd447; }
 .tv-svoya .tv-timer.warning, .tv-svoya .tv-timer-small.warning { color: #ff6b9d; }
+.tv-media { display: block; max-width: min(100%, 560px); max-height: 42vh; margin: 0 auto 1rem; border-radius: 8px; object-fit: contain; }
+.tv-audio { display: block; width: min(100%, 520px); margin: 0 auto 1rem; }
 
 /* ---------- ТВ: Миллионер ---------- */
 .tv-millionaire {
@@ -411,6 +415,8 @@ p { line-height: 1.55; }
 .player-screen > .player-toast { width: auto; max-width: calc(100% - 2rem); }
 .player-timer { text-align: center; font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #ffd447; margin-bottom: 0.75rem; font-variant-numeric: tabular-nums; }
 .player-timer.warning { color: #ff7a86; }
+.player-media { display: block; max-width: 100%; max-height: 32vh; margin: 0 auto 0.75rem; border-radius: 10px; object-fit: contain; }
+.player-audio-note { text-align: center; color: #ffd447; font-weight: 700; padding: 0.5rem; margin-bottom: 0.75rem; border: 1px dashed rgba(255, 212, 71, 0.5); border-radius: 10px; }
 .player-head { text-align: center; padding: 0.5rem 0 1rem; }
 .player-code { font-family: var(--font-display); letter-spacing: 6px; color: #ffd447; font-size: 1.4rem; }
 .player-question { font-family: var(--font-display); font-size: 1.2rem; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 212, 71, 0.4); border-radius: 12px; margin-bottom: 1rem; }

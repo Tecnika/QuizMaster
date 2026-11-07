@@ -157,6 +157,8 @@ export default function PlayerPage() {
           {myTurn && question && (
             <>
               <div className="player-question">{question.text}</div>
+              {question.imageUrl && <img className="player-media" src={question.imageUrl} alt="" />}
+              {question.audioUrl && <div className="player-audio-note">Аудио-вопрос озвучивает ведущий</div>}
 
               {turn?.status === 'answering' && (
                 <>
@@ -223,6 +225,8 @@ export default function PlayerPage() {
                 </div>
                 {question.text}
               </div>
+              {question.imageUrl && <img className="player-media" src={question.imageUrl} alt="" />}
+              {question.audioUrl && <div className="player-audio-note">Аудио-вопрос озвучивает ведущий</div>}
 
               {catHidden && <div className="player-status">Ведущий решает, кому передать кота.</div>}
               {auctionHidden && <div className="player-status">Идёт аукцион. Ведущий разыгрывает вопрос.</div>}

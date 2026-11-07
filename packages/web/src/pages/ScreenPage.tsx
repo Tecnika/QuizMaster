@@ -172,6 +172,8 @@ function MillionaireScreen({ session, participants }: { session: Session; partic
               Играет: {player?.name ?? '…'} · вопрос {currentIdx + 1} из 15
             </div>
             <div className="millionaire-question">{pq.text}</div>
+            {pq.imageUrl && <img className="tv-media" src={pq.imageUrl} alt="" />}
+            {pq.audioUrl && <audio className="tv-audio" controls src={pq.audioUrl} />}
             <div className="millionaire-answers">
               {(pq.options ?? []).map((text, i) => {
                 const hidden = turn.fiftyOptions?.length ? !turn.fiftyOptions.includes(i) : false;
@@ -311,6 +313,8 @@ function SvoyaScreen({ session, participants }: { session: Session; participants
             </span>
             {pq.text}
           </div>
+          {pq.imageUrl && <img className="tv-media" src={pq.imageUrl} alt="" />}
+          {pq.audioUrl && <audio className="tv-audio" controls src={pq.audioUrl} />}
           {session.catRecipientId && (
             <div className="svoya-round-title">
               Кот у: {participants.find((p) => p.id === session.catRecipientId)?.name}

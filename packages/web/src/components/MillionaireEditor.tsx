@@ -52,6 +52,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
   const [options, setOptions] = useState(['', '', '', '']);
   const [correct, setCorrect] = useState(0);
   const [comment, setComment] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -63,11 +65,15 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       setOptions(opts.slice(0, 4));
       setCorrect(question.correctIndex ?? 0);
       setComment(question.comment || '');
+      setImageUrl(question.imageUrl || '');
+      setAudioUrl(question.audioUrl || '');
     } else {
       setText('');
       setOptions(['', '', '', '']);
       setCorrect(0);
       setComment('');
+      setImageUrl('');
+      setAudioUrl('');
     }
   }, [question?.id]);
 
@@ -89,6 +95,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       correctIndex: correct,
       answer: cleaned[correct],
       comment: comment.trim(),
+      imageUrl: imageUrl.trim(),
+      audioUrl: audioUrl.trim(),
     };
     try {
       if (question) {
@@ -139,6 +147,7 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
           <div style={{ fontWeight: 700, marginBottom: '0.3rem' }}>{question.text}</div>
           <div className="qm-small">
             Верно: <b>{'ABCD'[question.correctIndex ?? 0]}</b> — {question.options?.[question.correctIndex ?? 0]}
+            {(question.imageUrl || question.audioUrl) && <span className="qm-badge" style={{ marginLeft: 8 }}>медиа</span>}
           </div>
         </div>
       ) : (
@@ -179,6 +188,26 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
               placeholder="Пояснение для ведущего"
             />
           </div>
+          <div className="qm-row">
+            <div className="qm-field">
+              <label className="qm-label">Картинка (URL)</label>
+              <input
+                className="qm-input" value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://…/image.jpg"
+              />
+            </div>
+            <div className="qm-field">
+              <label className="qm-label">Аудио (URL)</label>
+              <input
+                className="qm-input" value={audioUrl}
+                onChange={(e) => setAudioUrl(e.target.value)}
+                placeholder="https://…/audio.mp3"
+              />
+            </div>
+          </div>
+          {imageUrl && <img className="qm-media-preview" src={imageUrl} alt="" />}
+          {audioUrl && <audio className="qm-audio-preview" controls src={audioUrl} />}
           {error && <p className="qm-danger-text">{error}</p>}
           <div className="qm-inline">
             <button className="qm-btn qm-btn-primary" onClick={() => void save()} disabled={saving}>
