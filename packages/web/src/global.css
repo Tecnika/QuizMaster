@@ -215,7 +215,7 @@ p { line-height: 1.55; }
 }
 .qm-feature { text-align: left; }
 .qm-feature .icon { display: flex; align-items: center; color: var(--green); margin-bottom: 0.25rem; }
-.qm-feature h3 { margin: 0.4rem 0 0.3rem; }
+.qm-feature h2 { margin: 0.4rem 0 0.3rem; }
 .qm-feature p { color: var(--ink-soft); font-size: 0.93rem; margin: 0; }
 
 /* ---------- Список игр ---------- */

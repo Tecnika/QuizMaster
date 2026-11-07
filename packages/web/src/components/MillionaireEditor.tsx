@@ -47,10 +47,10 @@ export default function MillionaireEditor({ gameId, questions }: Props) {
 }
 
 function Slot({ index, question, gameId }: { index: number; question?: Question; gameId: string }) {
-  const [open, setOpen] = useState(!question?.text);
+  const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
-  const [correct, setCorrect] = useState(0);
+  const [correct, setCorrect] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
@@ -63,14 +63,14 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       const opts = [...(question.options || [])];
       while (opts.length < 4) opts.push('');
       setOptions(opts.slice(0, 4));
-      setCorrect(question.correctIndex ?? 0);
+      setCorrect(question.correctIndex ?? null);
       setComment(question.comment || '');
       setImageUrl(question.imageUrl || '');
       setAudioUrl(question.audioUrl || '');
     } else {
       setText('');
       setOptions(['', '', '', '']);
-      setCorrect(0);
+      setCorrect(null);
       setComment('');
       setImageUrl('');
       setAudioUrl('');
@@ -86,6 +86,7 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
     const cleaned = options.map((o) => o.trim());
     if (!text.trim()) return setError('Введите текст вопроса');
     if (cleaned.some((o) => !o)) return setError('Заполните все четыре варианта');
+    if (correct === null) return setError('Отметьте правильный ответ');
     setSaving(true);
     const data = {
       order: index,
@@ -130,6 +131,9 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
           </span>
         </div>
         <div className="qm-inline">
+          {!open && !question?.text && (
+            <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => setOpen(true)}>Заполнить</button>
+          )}
           {question?.text && !open && (
             <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => setOpen(true)}>Изменить</button>
           )}
@@ -142,20 +146,24 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
         </div>
       </div>
 
-      {!open && question?.text ? (
-        <div>
-          <div style={{ fontWeight: 700, marginBottom: '0.3rem' }}>{question.text}</div>
-          <div className="qm-small">
-            Верно: <b>{'ABCD'[question.correctIndex ?? 0]}</b> — {question.options?.[question.correctIndex ?? 0]}
-            {(question.imageUrl || question.audioUrl) && <span className="qm-badge" style={{ marginLeft: 8 }}>медиа</span>}
+      {!open ? (
+        question?.text ? (
+          <div>
+            <div style={{ fontWeight: 700, marginBottom: '0.3rem' }}>{question.text}</div>
+            <div className="qm-small">
+              Верно: <b>{'ABCD'[question.correctIndex ?? 0]}</b> — {question.options?.[question.correctIndex ?? 0]}
+              {(question.imageUrl || question.audioUrl) && <span className="qm-badge" style={{ marginLeft: 8 }}>медиа</span>}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="qm-small">Вопрос не добавлен</div>
+        )
       ) : (
         <div>
           <div className="qm-field">
             <label className="qm-label">Текст вопроса</label>
             <textarea
-              className="qm-textarea" value={text}
+              className="qm-textarea" value={text} required
               onChange={(e) => setText(e.target.value)}
               placeholder="Кто написал «Войну и мир»?"
             />
@@ -165,7 +173,7 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
             <div key={i} className={`qm-option-row${correct === i ? ' correct' : ''}`}>
               <span className="qm-option-letter">{'ABCD'[i]}</span>
               <input
-                className="qm-input" value={opt}
+                className="qm-input" value={opt} required
                 onChange={(e) => {
                   const next = [...options];
                   next[i] = e.target.value;

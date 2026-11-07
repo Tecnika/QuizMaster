@@ -33,7 +33,7 @@ function Shell({ children }: { children: JSX.Element }) {
   return (
     <div className="qm-app">
       <NavBar />
-      <div className="qm-container">{children}</div>
+      <main className="qm-container">{children}</main>
     </div>
   );
 }

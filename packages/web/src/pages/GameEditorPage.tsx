@@ -11,6 +11,7 @@ import {
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
+import { checkGameStart } from '../lib/gameStart';
 import MillionaireEditor from '../components/MillionaireEditor';
 import SvoyaEditor from '../components/SvoyaEditor';
 import type { Game, GameSettings, Question } from '@quizmaster/shared';
@@ -94,6 +95,12 @@ export default function GameEditorPage() {
     setStarting(true);
     setError('');
     try {
+      const check = checkGameStart(game, questions.length);
+      if (check.blocking) {
+        setError(check.message || 'В игре нет вопросов');
+        return;
+      }
+      if (check.message && !confirm(check.message)) return;
       const id = await createSession(game, user.uid);
       navigate(`/session/${id}`);
     } catch (e: any) {

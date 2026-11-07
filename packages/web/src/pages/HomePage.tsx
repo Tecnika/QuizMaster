@@ -28,24 +28,24 @@ export default function HomePage() {
       <section className="qm-grid qm-grid-2 qm-mt-lg">
         <div className="qm-card qm-feature">
           <div className="icon"><IconBulb size={32} /></div>
-          <h3>Кто хочет стать миллионером?</h3>
+          <h2>Кто хочет стать миллионером?</h2>
           <p>15 вопросов, лестница сумм, несгораемые рубежи и три подсказки. Каждый участник проходит свою игру.</p>
           <p className="qm-mt"><Link className="qm-link" to="/rules#millionaire">Правила →</Link></p>
         </div>
         <div className="qm-card qm-feature">
           <div className="icon"><IconBrain size={32} /></div>
-          <h3>Своя игра</h3>
+          <h2>Своя игра</h2>
           <p>Табло с темами и стоимостями, раунды, «Кот в мешке», «Аукцион» и финал. Команды выбирают вопрос и отвечают.</p>
           <p className="qm-mt"><Link className="qm-link" to="/rules#svoya">Правила →</Link></p>
         </div>
         <div className="qm-card qm-feature">
           <div className="icon"><IconController size={32} /></div>
-          <h3>Сессии без регистрации</h3>
+          <h2>Сессии без регистрации</h2>
           <p>Ведущий вводит участников, раздаёт код — игроки открывают ссылку, выбирают своё имя и нажимают ответы.</p>
         </div>
         <div className="qm-card qm-feature">
           <div className="icon"><IconTrophy size={32} /></div>
-          <h3>Результаты и рейтинг</h3>
+          <h2>Результаты и рейтинг</h2>
           <p>Очки считаются автоматически: выигрыш по лестнице или счёт команд на табло. Победитель виден сразу.</p>
         </div>
       </section>

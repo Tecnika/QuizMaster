@@ -36,7 +36,7 @@ export default function PlayerPage() {
 
   if (!sessionId || !claim) {
     return (
-      <div className="player-screen">
+      <div className="player-screen" role="main">
         <div className="qm-card qm-center" style={{ margin: 'auto' }}>
           <p>Вы ещё не присоединились к игре.</p>
           <Link className="qm-btn qm-btn-primary" to="/join">Ввести код комнаты</Link>
@@ -46,13 +46,13 @@ export default function PlayerPage() {
   }
 
   if (!session) {
-    return <div className="player-screen"><div className="player-status">Загрузка…</div></div>;
+    return <div className="player-screen" role="main"><div className="player-status">Загрузка…</div></div>;
   }
 
   const me = participants.find((p) => p.id === claim.participantId);
   if (!me) {
     return (
-      <div className="player-screen">
+      <div className="player-screen" role="main">
         <div className="qm-card qm-center" style={{ margin: 'auto' }}>
           <p>Ведущий удалил этого участника из сессии.</p>
           <Link className="qm-btn qm-btn-primary" to={`/join/${session.code}`}>Выбрать другое имя</Link>
@@ -101,7 +101,7 @@ export default function PlayerPage() {
   const expired = timeLeft === 0;
 
   return (
-    <div className="player-screen">
+    <div className="player-screen" role="main">
       <div className="player-head">
         <div className="qm-inline" style={{ justifyContent: 'space-between' }}>
           <span className="tv-logo" style={{ color: '#ffd447' }}>

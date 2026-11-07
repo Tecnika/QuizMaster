@@ -70,6 +70,7 @@ export async function createSession(game: Game, hostId: string): Promise<string>
   const ref = await addDoc(collection(db, 'sessions'), {
     gameId: game.id,
     gameType: game.type,
+    gameTitle: game.title,
     hostId,
     code,
     status: 'lobby',

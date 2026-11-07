@@ -443,7 +443,7 @@ export default function SessionHostPage() {
   );
 
   if (!session) {
-    return <div className="tv tv-millionaire"><div className="tv-top"><span className="tv-logo">Загрузка…</span></div></div>;
+    return <div className="tv tv-millionaire" role="main"><div className="tv-top"><span className="tv-logo">Загрузка…</span></div></div>;
   }
 
   const joinUrl = `${window.location.origin}/QuizMaster/join/${session.code}`;
@@ -455,7 +455,7 @@ export default function SessionHostPage() {
   };
 
   return (
-    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : 'tv-svoya'}`}>
+    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <Link to="/cabinet" className="tv-icon-btn">← Кабинет</Link>

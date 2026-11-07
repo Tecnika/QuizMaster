@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { useCountdown } from '../lib/useCountdown';
 import { subscribeParticipants, subscribeSession } from '../lib/session';
 import {
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
   formatCountdown,
-  type Game,
   type Participant,
   type Session,
 } from '@quizmaster/shared';
@@ -20,7 +17,6 @@ export default function ScreenPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [game, setGame] = useState<Game | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -35,18 +31,11 @@ export default function ScreenPage() {
     return subscribeParticipants(sessionId, setParticipants);
   }, [sessionId]);
 
-  useEffect(() => {
-    if (!session?.gameId) return;
-    return onSnapshot(doc(db, 'games', session.gameId), (snap) => {
-      if (snap.exists()) setGame({ id: snap.id, ...snap.data() } as Game);
-    });
-  }, [session?.gameId]);
-
   const timeLeft = useCountdown(session?.timer?.endsAt ?? null);
 
   if (!loaded) {
     return (
-      <div className="tv tv-millionaire">
+      <div className="tv tv-millionaire" role="main">
         <div className="tv-top"><span className="tv-logo">Загрузка…</span></div>
       </div>
     );
@@ -54,17 +43,17 @@ export default function ScreenPage() {
 
   if (!session) {
     return (
-      <div className="tv tv-millionaire">
+      <div className="tv tv-millionaire" role="main">
         <div className="tv-top"><span className="tv-logo">Сессия не найдена</span></div>
       </div>
     );
   }
 
   const isMillionaire = session.gameType === 'millionaire';
-  const title = game?.title || 'QuizMaster';
+  const title = session.gameTitle || 'QuizMaster';
 
   return (
-    <div className={`tv ${isMillionaire ? 'tv-millionaire' : 'tv-svoya'}`}>
+    <div className={`tv ${isMillionaire ? 'tv-millionaire' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <span className="tv-logo">{title}</span>

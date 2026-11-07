@@ -86,7 +86,7 @@ export default function NewGamePage() {
               style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'millionaire' ? 'var(--green)' : undefined, boxShadow: type === 'millionaire' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
             >
               <div className="icon"><IconCoins size={32} /></div>
-              <h3>Кто хочет стать миллионером?</h3>
+              <h2>Кто хочет стать миллионером?</h2>
               <p>15 вопросов, лестница сумм, несгораемые рубежи, подсказки.</p>
             </button>
             <button
@@ -96,7 +96,7 @@ export default function NewGamePage() {
               style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'svoya' ? 'var(--green)' : undefined, boxShadow: type === 'svoya' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
             >
               <div className="icon"><IconBrain size={32} /></div>
-              <h3>Своя игра</h3>
+              <h2>Своя игра</h2>
               <p>Табло тем и стоимостей, раунды, «Кот в мешке», «Аукцион», финал.</p>
             </button>
           </div>

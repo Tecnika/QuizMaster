@@ -12,6 +12,7 @@
     "deploy:firestore": "firebase deploy --only firestore",
     "test": "npm run test:unit",
     "test:unit": "npm run test:unit -w packages/shared",
+    "test:rules": "node scripts/test-rules.mjs",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {

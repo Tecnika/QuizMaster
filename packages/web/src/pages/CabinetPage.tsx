@@ -4,6 +4,7 @@ import { collection, query, where, onSnapshot, deleteDoc, doc, getDocs } from 'f
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
+import { checkGameStart } from '../lib/gameStart';
 import { IconBrain, IconCoins, IconFolder, IconPlus } from '../components/icons';
 import type { Game } from '@quizmaster/shared';
 
@@ -29,6 +30,13 @@ export default function CabinetPage() {
     setError('');
     setBusyId(game.id);
     try {
+      const qs = await getDocs(collection(db, 'games', game.id, 'questions'));
+      const check = checkGameStart(game, qs.size);
+      if (check.blocking) {
+        setError(check.message || 'В игре нет вопросов');
+        return;
+      }
+      if (check.message && !confirm(check.message)) return;
       const id = await createSession(game, user.uid);
       navigate(`/session/${id}`);
     } catch (e: any) {

@@ -31,10 +31,11 @@ service cloud.firestore {
       allow list: if false;
     }
 
-    // Игры: каталог публичный, редактирует только автор
+    // Игры: читает только автор (кабинет/редактор/ведущий).
+    // Игроки и экран получают нужные данные из сессии (gameTitle, publicQuestion).
     match /games/{gameId} {
-      allow get: if true;
-      allow list: if true;
+      allow get, list: if signedIn()
+        && resource.data.authorId == uid();
       allow create: if signedIn()
         && request.resource.data.authorId == uid();
       allow update, delete: if signedIn()
@@ -57,7 +58,8 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.hostId == uid();
     }
 
-    // Сессии
+    // Сессии: публичный get по ID нужен игрокам и экрану.
+    // Правильные ответы в сессии не хранятся; менять сессию может только ведущий.
     match /sessions/{sessionId} {
       allow get: if true;
       allow list: if false;

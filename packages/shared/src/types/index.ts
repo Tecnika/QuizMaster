@@ -126,6 +126,7 @@ export interface Session {
   id: string;
   gameId: string;
   gameType: GameType;
+  gameTitle?: string;
   hostId: string;
   code: string;
   status: SessionStatus;

@@ -188,7 +188,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
         <div className="qm-field">
           <label className="qm-label">Тема</label>
           <input
-            className="qm-input" value={theme} list="svoya-themes"
+            className="qm-input" value={theme} list="svoya-themes" required
             onChange={(e) => setTheme(e.target.value)}
             placeholder="Например, «История»"
           />
@@ -200,7 +200,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
         <div className="qm-field">
           <label className="qm-label">Текст вопроса</label>
           <textarea
-            className="qm-textarea" value={text}
+            className="qm-textarea" value={text} required
             onChange={(e) => setText(e.target.value)}
             placeholder="Этот писатель владел имением Ясная Поляна"
           />
@@ -209,7 +209,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
           <div className="qm-field">
             <label className="qm-label">Правильный ответ</label>
             <input
-              className="qm-input" value={answer}
+              className="qm-input" value={answer} required
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Лев Толстой"
             />
