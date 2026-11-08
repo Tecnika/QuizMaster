@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, query, where, onSnapshot, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { collection, query, where, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
@@ -18,21 +18,24 @@ export default function CabinetPage() {
 
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
     setLoading(true);
+    setError('');
     const q = query(collection(db, 'games'), where('authorId', '==', user.uid));
-    return onSnapshot(
-      q,
-      (snap) => {
+    getDocs(q)
+      .then((snap) => {
+        if (cancelled) return;
         const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game));
         list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
         setGames(list);
         setLoading(false);
-      },
-      (err) => {
+      })
+      .catch((err) => {
+        if (cancelled) return;
         setError(`Не удалось загрузить игры: ${err.message}`);
         setLoading(false);
-      },
-    );
+      });
+    return () => { cancelled = true; };
   }, [user]);
 
   const startSession = async (game: Game) => {
@@ -61,6 +64,7 @@ export default function CabinetPage() {
     const qs = await getDocs(collection(db, 'games', game.id, 'questions'));
     await Promise.all(qs.docs.map((d) => deleteDoc(d.ref)));
     await deleteDoc(doc(db, 'games', game.id));
+    setGames((prev) => prev.filter((g) => g.id !== game.id));
   };
 
   return (
