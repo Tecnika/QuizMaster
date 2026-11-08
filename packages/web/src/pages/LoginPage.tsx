@@ -1,9 +1,8 @@
 import { useState, FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
   const { login } = useAuth();
   const [loginName, setLoginName] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +15,7 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await login(loginName.trim(), password);
-      navigate('/cabinet');
+      window.location.replace('/QuizMaster/cabinet');
     } catch (err: any) {
       const msg =
         err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'

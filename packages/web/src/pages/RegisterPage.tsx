@@ -1,9 +1,8 @@
 import { useState, FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { isValidLogin, useAuth } from '../lib/auth';
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
   const { register } = useAuth();
   const [loginName, setLoginName] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +28,7 @@ export default function RegisterPage() {
     setBusy(true);
     try {
       await register(loginName.trim(), password);
-      navigate('/cabinet');
+      window.location.replace('/QuizMaster/cabinet');
     } catch (err: any) {
       const msg =
         err.code === 'auth/email-already-in-use'

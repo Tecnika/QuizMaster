@@ -13,16 +13,26 @@ export default function CabinetPage() {
   const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!user) return;
+    setLoading(true);
     const q = query(collection(db, 'games'), where('authorId', '==', user.uid));
-    return onSnapshot(q, (snap) => {
-      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game));
-      list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-      setGames(list);
-    });
+    return onSnapshot(
+      q,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Game));
+        list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        setGames(list);
+        setLoading(false);
+      },
+      (err) => {
+        setError(`Не удалось загрузить игры: ${err.message}`);
+        setLoading(false);
+      },
+    );
   }, [user]);
 
   const startSession = async (game: Game) => {
@@ -66,7 +76,9 @@ export default function CabinetPage() {
 
       {error && <div className="qm-card qm-danger-text">{error}</div>}
 
-      {games.length === 0 ? (
+      {loading ? (
+        <div className="qm-card qm-center">Загрузка…</div>
+      ) : error ? null : games.length === 0 ? (
         <div className="qm-card qm-empty">
           <span className="icon"><IconFolder size={40} /></span>
           <p>Пока нет игр. Создайте первую — это займёт минуту.</p>
