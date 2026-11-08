@@ -225,7 +225,7 @@ export default function QuizHost({
             <>
               <div className="quiz-question-head">
                 <span>{active.quizBonus ? 'Общий вопрос' : `Вопрос ${activeIndex + 1} из ${roundQuestions.length}`}</span>
-                <span>{round.points} очк.</span>
+                <span>{active.quizBonus ? `бонус +${settings.bonusPoints}` : `${round.points} очк.`}</span>
                 {timeLeft != null && (
                   <span className={`tv-timer-small${timeLeft === 0 ? ' warning' : ''}`}>
                     {timeLeft > 0 ? formatCountdown(timeLeft) : 'Время вышло'}
@@ -237,6 +237,7 @@ export default function QuizHost({
 
               <QuestionImage className="tv-media" mediaId={active.imageMediaId} src={active.imageUrl} />
               <QuestionAudio className="tv-audio" mediaId={active.audioMediaId} src={active.audioUrl} />
+              <div className="tv-answer-key">Ответ ведущего: {active.answer}</div>
 
               {active.options?.length ? (
                 round.type === 'pairs' ? (
