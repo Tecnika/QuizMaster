@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="qm-card qm-feature">
           <div className="icon"><IconUsers size={32} /></div>
           <h2>Классический квиз</h2>
-          <p>Семь раундов и 51 вопрос: разминка, бинго, медиа, блиц, пары и казино. Команды сдают бланки.</p>
+          <p>Семь раундов и 51 вопрос: разминка, бинго, медиа, блиц, пары и казино. Команды отвечают с телефона, ведущий проверяет.</p>
           <p className="qm-mt"><Link className="qm-link" to="/rules#quiz">Правила →</Link></p>
         </div>
         <div className="qm-card qm-feature">

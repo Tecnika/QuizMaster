@@ -87,7 +87,7 @@ export default function QuizEditor({ gameId, questions, settings, onUpdateSettin
           <div>
             <h2 className="qm-card-title">Классический квиз</h2>
             <p className="qm-card-muted">
-              7 раундов, 51 вопрос. Команды пишут ответы на бланках, ведущий отмечает верные.
+              7 раундов, 51 вопрос. Команды отвечают с телефона, ведущий проверяет и отмечает верные.
             </p>
           </div>
           <span className="qm-badge qm-badge-gold">51 вопрос</span>

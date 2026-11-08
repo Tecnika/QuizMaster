@@ -906,6 +906,7 @@ export default function SessionHostPage() {
           game={game}
           participants={participants}
           questions={questions}
+          answers={answers}
           onPatch={patchSession}
           onFinish={finishGame}
           timerLimit={timerLimit}

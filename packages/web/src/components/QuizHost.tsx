@@ -8,6 +8,7 @@ import {
   quizRoundTypeLabel,
   quizScores,
   quizSettings,
+  type Answer,
   type Game,
   type Participant,
   type PublicQuestion,
@@ -23,6 +24,7 @@ interface Props {
   game: Game;
   participants: Participant[];
   questions: Question[];
+  answers: Answer[];
   onPatch: (patch: Record<string, unknown>) => Promise<void>;
   onFinish: () => Promise<void>;
   timerLimit: number;
@@ -49,6 +51,7 @@ export default function QuizHost({
   game,
   participants,
   questions,
+  answers,
   onPatch,
   onFinish,
   timerLimit,
@@ -66,6 +69,35 @@ export default function QuizHost({
   const activeMarks = active ? marks[active.id] ?? {} : {};
   const activeBets = active ? bets[active.id] ?? {} : {};
   const activeIndex = active ? roundQuestions.findIndex((q) => q.id === active.id) : -1;
+
+  const latestByTeam = new Map<string, Answer>();
+  if (active) {
+    for (const answer of answers) {
+      if (answer.questionId === active.id && answer.type !== 'buzz') {
+        latestByTeam.set(answer.participantId, answer);
+      }
+    }
+  }
+
+  const answerText = (answer: Answer) => {
+    if (answer.choice != null && active?.options?.[answer.choice] != null) {
+      return `${'ABCD'[answer.choice]} — ${active.options[answer.choice]}`;
+    }
+    return answer.text || '—';
+  };
+
+  const answerHint = (answer: Answer): 'match' | 'mismatch' | 'manual' => {
+    if (!active) return 'manual';
+    if (round.type === 'pairs') return 'manual';
+    if (answer.choice != null && active.correctIndex != null) {
+      return answer.choice === active.correctIndex ? 'match' : 'mismatch';
+    }
+    if (answer.text && active.answer) {
+      const norm = (value: string) => value.toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]/gi, '');
+      return norm(answer.text) === norm(active.answer) ? 'match' : 'manual';
+    }
+    return 'manual';
+  };
 
   const sortedTeams = [...participants].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
@@ -306,32 +338,53 @@ export default function QuizHost({
               )}
 
               <div className="quiz-marking">
-                <div className="qm-label">Отметки команд</div>
+                <div className="qm-label">
+                  Ответы и проверка · {latestByTeam.size} из {participants.length}
+                </div>
                 {participants.map((p) => {
                   const mark = activeMarks[p.id];
+                  const answer = latestByTeam.get(p.id);
+                  const hint = answer ? answerHint(answer) : 'manual';
                   return (
                     <div key={p.id} className={`quiz-mark-row${mark === true ? ' correct' : mark === false ? ' wrong' : ''}`}>
-                      <span className="name">{p.name}</span>
-                      <span className="score">{p.score ?? 0}</span>
-                      <button
-                        className={`tv-icon-btn${mark === true ? ' ok' : ''}`}
-                        onClick={() => setMark(p, true)}
-                        title="Верно"
-                      >
-                        ✓ Верно
-                      </button>
-                      <button
-                        className={`tv-icon-btn${mark === false ? ' bad' : ''}`}
-                        onClick={() => setMark(p, false)}
-                        title="Неверно"
-                      >
-                        ✕ Неверно
-                      </button>
+                      <div className="quiz-mark-team">
+                        <span className="name">{p.name}</span>
+                        <span className="score">{p.score ?? 0}</span>
+                      </div>
+                      <div className="quiz-mark-answer">
+                        {answer ? (
+                          <>
+                            <span className="answer-value">{answerText(answer)}</span>
+                            {hint === 'match' && <span className="quiz-answer-flag match">совпадает</span>}
+                            {hint === 'mismatch' && <span className="quiz-answer-flag mismatch">не совпадает</span>}
+                            {hint === 'manual' && <span className="quiz-answer-flag">сверьте вручную</span>}
+                          </>
+                        ) : (
+                          <span className="empty">ответ не отправлен</span>
+                        )}
+                      </div>
+                      <div className="quiz-mark-actions">
+                        <button
+                          className={`tv-icon-btn${mark === true ? ' ok' : ''}`}
+                          onClick={() => setMark(p, true)}
+                          title="Верно"
+                        >
+                          ✓ Верно
+                        </button>
+                        <button
+                          className={`tv-icon-btn${mark === false ? ' bad' : ''}`}
+                          onClick={() => setMark(p, false)}
+                          title="Неверно"
+                        >
+                          ✕ Неверно
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
                 <p className="qm-small">
-                  Отмечено верно: {quizCorrectCount(marks, active.id)}. Повторное нажатие снимает отметку.
+                  Отмечено верно: {quizCorrectCount(marks, active.id)}. Ведущий проверяет присланные ответы
+                  и ставит отметку; повторное нажатие снимает её.
                 </p>
               </div>
             </>

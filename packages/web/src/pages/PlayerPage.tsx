@@ -91,6 +91,17 @@ export default function PlayerPage() {
     }
   };
 
+  const submitQuiz = async (payload: { choice?: number; text?: string }) => {
+    if (!question?.id) return;
+    if (timeLeft === 0) throw new Error('Время вышло');
+    await submitAnswer(sessionId, claim, {
+      questionId: question.id,
+      type: payload.text !== undefined ? 'text' : 'choice',
+      choice: payload.choice,
+      text: payload.text,
+    });
+  };
+
   const answerOptions = question?.options?.map((text, index) => ({ text, index })) ?? [];
   const visibleOptions = turn?.fiftyOptions?.length
     ? answerOptions.filter((o) => turn.fiftyOptions!.includes(o.index))
@@ -228,7 +239,12 @@ export default function PlayerPage() {
       )}
 
       {session.status === 'active' && isQuiz && (
-        <QuizPlayer session={session} me={me} />
+        <QuizPlayer
+          key={question?.id ?? 'no-question'}
+          session={session}
+          me={me}
+          onSubmit={submitQuiz}
+        />
       )}
 
       {session.status === 'active' && !isMillionaire && !isMelody && !isQuiz && (

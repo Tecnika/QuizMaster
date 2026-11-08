@@ -68,7 +68,7 @@ export default function RulesPage() {
       <section className="qm-card" id="quiz">
         <div className="qm-eyebrow">Формат 4</div>
         <h2 className="qm-title">Классический квиз</h2>
-        <p>Командная игра в формате паб-квиза: ведущий читает вопросы, команды обсуждают и сдают ответы на бланках.</p>
+        <p>Командная игра в формате паб-квиза: ведущий читает вопросы, команды обсуждают и отправляют ответ с телефона, а ведущий проверяет и начисляет очки.</p>
         <div className="qm-grid qm-grid-4 qm-mt">
           <div className="qm-stat"><b>7</b><span>раундов</span></div>
           <div className="qm-stat"><b>51</b><span>вопрос</span></div>
