@@ -99,6 +99,21 @@ export default function QuizHost({
     return 'manual';
   };
 
+  const autoCheck = () => {
+    if (!active) return;
+    const nextQuestionMarks = { ...activeMarks };
+    const norm = (value: string) => value.toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]/gi, '');
+    for (const [participantId, answer] of latestByTeam) {
+      if (round.type === 'pairs') continue;
+      if (answer.choice != null && active.correctIndex != null) {
+        nextQuestionMarks[participantId] = answer.choice === active.correctIndex;
+      } else if (answer.text) {
+        nextQuestionMarks[participantId] = norm(answer.text) === norm(active.answer);
+      }
+    }
+    void applyScores({ ...marks, [active.id]: nextQuestionMarks }, bets);
+  };
+
   const sortedTeams = [...participants].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
   const applyScores = async (
@@ -338,8 +353,18 @@ export default function QuizHost({
               )}
 
               <div className="quiz-marking">
-                <div className="qm-label">
-                  Ответы и проверка · {latestByTeam.size} из {participants.length}
+                <div className="quiz-marking-head">
+                  <div className="qm-label">
+                    Ответы и проверка · {latestByTeam.size} из {participants.length}
+                  </div>
+                  <button
+                    className="tv-icon-btn"
+                    onClick={autoCheck}
+                    disabled={latestByTeam.size === 0}
+                    title="Отметить точные совпадения; спорные проверьте вручную"
+                  >
+                    Автопроверка
+                  </button>
                 </div>
                 {participants.map((p) => {
                   const mark = activeMarks[p.id];
@@ -383,8 +408,8 @@ export default function QuizHost({
                   );
                 })}
                 <p className="qm-small">
-                  Отмечено верно: {quizCorrectCount(marks, active.id)}. Ведущий проверяет присланные ответы
-                  и ставит отметку; повторное нажатие снимает её.
+                  Отмечено верно: {quizCorrectCount(marks, active.id)}. Автопроверка ставит только точные
+                  совпадения; неверные и спорные ответы проверьте вручную. Повторное нажатие снимает отметку.
                 </p>
               </div>
             </>

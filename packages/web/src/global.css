@@ -692,6 +692,8 @@ p { line-height: 1.55; }
 .quiz-answer-flag.match { color: #7dffb0; border-color: #37d67a; }
 .quiz-answer-flag.mismatch { color: #ff9aa6; border-color: #ff5a6a; }
 .quiz-mark-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.quiz-marking-head { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }
+.quiz-marking-head .tv-icon-btn { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
 
 .quiz-screen-round { display: flex; align-items: center; justify-content: center; gap: 0.8rem; flex-wrap: wrap; font-family: var(--font-display); color: #ffd447; letter-spacing: 1px; text-transform: uppercase; }
 .quiz-screen-hint { text-align: center; color: #bfeee2; font-size: 1rem; }
