@@ -35,6 +35,7 @@ sessions/{sid}/participants/{pid}  name, score, color
 sessions/{sid}/claims/{pid}        публичная метка «имя занято»
 sessions/{sid}/tokens/{pid}        секретный токен игрока (читает только ведущий)
 sessions/{sid}/answers/{aid}      participantId, questionId, token, type, choice, text
+media/{mediaId}                    dataUrl, kind, authorId, name, mime, size
 ```
 
 ## Security model
@@ -43,13 +44,15 @@ sessions/{sid}/answers/{aid}      participantId, questionId, token, type, choice
 - Игроки **не проходят Firebase Auth**. Код комнаты → `joinCodes` → `sessionId` → выбор имени → локальный токен.
 - `tokens` создаётся один раз; `answers` создаётся только с совпадающим токеном. Ответы читает только ведущий.
 - Публичный снимок вопроса в сессии не содержит правильного ответа; ведущий раскрывает его отдельно.
-- Правила покрыты сквозным REST-тестом (17 проверок).
+- Медиатека `media` доступна на чтение всем (игрокам и экрану), запись — только автору файла; `list` закрыт.
+- Правила покрыты сквозным REST-тестом (27 проверок).
 
 ## Design
 
 - Сайт: настольная игра — дерево, бумага, карточки, фишки, тёплые цвета (`src/global.css`).
 - «Миллионер»: тёмно-синий/фиолетовый зал, золото, лестница, варианты-плитки (`.tv-millionaire`).
 - «Своя игра»: синий зал, золотое табло (`.tv-svoya`).
+- «Угадай мелодию»: сливовый зал, золотые ноты и растущий приз (`.tv-melody`).
 - Экраны игроков — отдельный мобильный стиль (`.player-screen`).
 
 ## Key modules
@@ -61,6 +64,9 @@ sessions/{sid}/answers/{aid}      participantId, questionId, token, type, choice
 | Sessions | `packages/web/src/lib/session.ts` | Код, claim, токен, ответы, подписки |
 | Millionaire logic | `packages/shared/src/utils/millionaire.ts` | Лестница, несгораемые, 50/50 |
 | Svoya logic | `packages/shared/src/utils/svoya.ts` | Табло, очки, финал |
+| Melody logic | `packages/shared/src/utils/melody.ts` | Туры, растущий приз, торги, суперигра |
+| Media library | `packages/web/src/lib/media.ts` | Сжатие картинок, загрузка файлов в Firestore |
+| Media fields | `packages/web/src/components/MediaField.tsx` | Загрузка файла или ссылка, превью |
 | Codes | `packages/shared/src/utils/code.ts` | Коды комнат и токены |
 | Rules | `firestore.rules` | Вся безопасность |
 | Design | `packages/web/src/global.css` | Настольная и ТВ-стилистика |

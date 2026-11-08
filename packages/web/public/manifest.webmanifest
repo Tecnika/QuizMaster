@@ -1,7 +1,7 @@
 {
   "name": "QuizMaster Constructor",
   "short_name": "QuizMaster",
-  "description": "Конструктор викторин «Кто хочет стать миллионером?» и «Своя игра» с живыми сессиями.",
+  "description": "Конструктор викторин «Кто хочет стать миллионером?», «Своя игра» и «Угадай мелодию» с живыми сессиями.",
   "lang": "ru",
   "start_url": "/QuizMaster/",
   "scope": "/QuizMaster/",
