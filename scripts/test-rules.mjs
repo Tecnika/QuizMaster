@@ -60,7 +60,7 @@ function check(name, ok, detail = '') {
 }
 
 (async () => {
-  let idToken, uid, gameId, qid, sid, pid;
+  let idToken, uid, gameId, qid, sid, pid, mediaId;
 
   try {
     const sign = await req(`${ID}/accounts:signUp?key=${API_KEY}`, {
@@ -89,6 +89,24 @@ function check(name, ok, detail = '') {
     }, idToken);
     check('create question', q.status === 200, `status ${q.status}`);
     qid = idOf(q.data.name);
+
+    const media = await fs('POST', 'media', {
+      authorId: uid, kind: 'audio', name: 'test.mp3', mime: 'audio/mpeg', size: 8,
+      dataUrl: 'data:audio/mpeg;base64,AAAA', createdAt: now,
+    }, idToken);
+    check('create media', media.status === 200, `status ${media.status}`);
+    mediaId = idOf(media.data.name);
+
+    const mediaPublic = await fs('GET', `media/${mediaId}`, null, null, true);
+    check('public get media', mediaPublic.status === 200, `status ${mediaPublic.status}`);
+
+    const mediaList = await fs('GET', 'media', null, null, true);
+    check('public list media DENIED', mediaList.status === 403, `status ${mediaList.status}`);
+
+    const mediaAnon = await fs('POST', 'media', {
+      authorId: uid, kind: 'image', dataUrl: 'data:image/png;base64,AAAA',
+    }, null, true);
+    check('anonymous create media DENIED', mediaAnon.status === 403, `status ${mediaAnon.status}`);
 
     const s = await fs('POST', 'sessions', {
       gameId, gameType: 'millionaire', gameTitle: 'Rules Test', hostId: uid, code, status: 'lobby',
@@ -172,6 +190,7 @@ function check(name, ok, detail = '') {
         }
       }
       if (code && idToken) await fs('DELETE', `joinCodes/${code}`, null, idToken);
+      if (mediaId && idToken) await fs('DELETE', `media/${mediaId}`, null, idToken);
       if (sid && idToken) await fs('DELETE', `sessions/${sid}`, null, idToken);
       if (gameId && idToken) {
         const qs = await fs('GET', `games/${gameId}/questions`, null, idToken);

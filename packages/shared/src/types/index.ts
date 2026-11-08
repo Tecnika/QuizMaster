@@ -1,4 +1,4 @@
-export type GameType = 'millionaire' | 'svoya';
+export type GameType = 'millionaire' | 'svoya' | 'melody';
 export type GameStatus = 'draft' | 'ready' | 'archived';
 export type UserRole = 'author' | 'admin';
 
@@ -18,6 +18,23 @@ export interface SvoyaRound {
   values: number[];
 }
 
+export interface MelodySettings {
+  /** Названия четырёх категорий первого и второго тура. */
+  categories: string[];
+  /** Стоимости «нот» первого тура (4 значения). */
+  round1Values: number[];
+  /** Стартовый приз второго тура. */
+  startPrize: number;
+  /** Прирост приза за секунду во втором туре. */
+  growthPerSecond: number;
+  /** Сколько очков нужно для выхода в суперигру. */
+  pointsToWin: number;
+  /** Длительность суперигры в секундах. */
+  superSeconds: number;
+  /** Бонус за семь угаданных мелодий в суперигре. */
+  superBonus: number;
+}
+
 export interface GameSettings {
   /** Лестница «Миллионера» (15 значений). */
   ladder?: number[];
@@ -31,6 +48,8 @@ export interface GameSettings {
   finalRound?: boolean;
   /** Лимит времени на вопрос в секундах (0 — без ограничения). */
   timeLimitSeconds?: number;
+  /** Настройки «Угадай мелодию». */
+  melody?: MelodySettings;
 }
 
 export interface Game {
@@ -55,6 +74,10 @@ export interface Question {
   imageUrl?: string;
   /** Ссылка на аудио к вопросу. */
   audioUrl?: string;
+  /** Файл картинки в медиатеке Firestore. */
+  imageMediaId?: string;
+  /** Файл аудио в медиатеке Firestore. */
+  audioMediaId?: string;
 
   /** «Миллионер» */
   options?: string[];
@@ -75,6 +98,8 @@ export interface PublicQuestion {
   options?: string[];
   imageUrl?: string;
   audioUrl?: string;
+  imageMediaId?: string;
+  audioMediaId?: string;
   round?: number;
   theme?: string;
   value?: number;
@@ -120,6 +145,8 @@ export interface SvoyaCell {
   value: number;
   kind: QuestionKind;
   used: boolean;
+  /** Порядок внутри раунда (для «Угадай мелодию»). */
+  order?: number;
 }
 
 export interface Session {
@@ -146,6 +173,26 @@ export interface Session {
   auctionBid?: number | null;
   /** Таймер текущего вопроса. */
   timer?: { endsAt: number; duration: number } | null;
+
+  /** «Угадай мелодию»: текущий тур (1–4). */
+  melodyRound?: number | null;
+  /** Текущий приз второго тура. */
+  melodyPrize?: number | null;
+  /** Момент, с которого растёт приз второго тура. */
+  melodyPrizeStartedAt?: number | null;
+  /** Очки третьего тура: участник → победы в торгах. */
+  melodyPoints?: Record<string, number> | null;
+  /** Ставки торгов: участник → со скольких нот угадает. */
+  melodyBids?: Record<string, number> | null;
+  /** Кто пропускает мелодии после ошибки: участник → сколько осталось. */
+  melodySkips?: Record<string, number> | null;
+  /** Выбывшие после второго тура. */
+  melodyOut?: string[] | null;
+  /** Суперигра: старт, найденные мелодии и завершение. */
+  melodySuper?: { startedAt: number; found: string[]; finished: boolean } | null;
+  /** Снимок настроек «Угадай мелодию» для экрана и игроков. */
+  melodyConfig?: MelodySettings | null;
+
   finalStage?: {
     active: boolean;
     themes: string[];

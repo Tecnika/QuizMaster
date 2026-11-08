@@ -430,6 +430,139 @@ p { line-height: 1.55; }
 .player-status { text-align: center; padding: 1rem; color: #b9c6ff; }
 .player-toast { position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%); background: #0a1240; border: 1px solid #ffd447; color: #fff; padding: 0.7rem 1.1rem; border-radius: 10px; }
 
+/* ---------- Медиатека ---------- */
+.qm-media-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.35rem 0; }
+.qm-media-hint { margin: 0 0 0.45rem; }
+
+/* ---------- Редактор «Угадай мелодию» ---------- */
+.qm-melody-editor { width: 100%; border-collapse: separate; border-spacing: 6px; }
+.qm-melody-editor th {
+  padding: 0.4rem 0.5rem; border-radius: 6px; font-size: 0.85rem;
+  color: var(--ink); background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #d9c6a4;
+}
+.qm-melody-editor td { padding: 0; vertical-align: stretch; }
+.qm-melody-slot {
+  width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center;
+  gap: 0.35rem; padding: 0.4rem 0.5rem; border-radius: 8px;
+  border: 2px dashed #cbb98f; background: rgba(255, 255, 255, 0.45);
+  color: #9a8a66; cursor: pointer; font-weight: 700; font-size: 0.8rem;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.qm-melody-slot:hover { border-color: var(--green); transform: translateY(-1px); }
+.qm-melody-slot.done { border-style: solid; border-color: #9cc7ac; background: #eaf6ee; color: var(--green); }
+.qm-melody-slot span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qm-melody-slot .plus { font-size: 1.3rem; }
+.qm-category-input { min-width: 140px; font-weight: 700; padding: 0.35rem 0.5rem; }
+
+/* ---------- ТВ: Угадай мелодию ---------- */
+.tv-melody {
+  font-family: "Arial", "Helvetica", sans-serif;
+  background:
+    radial-gradient(900px 520px at 50% -15%, rgba(180, 70, 200, 0.35), transparent 62%),
+    radial-gradient(700px 500px at 0% 100%, rgba(60, 30, 120, 0.5), transparent 60%),
+    linear-gradient(180deg, #10041f 0%, #1d0a3a 55%, #09020f 100%);
+}
+.tv-melody .tv-logo { color: #ffd447; text-shadow: 0 0 18px rgba(255, 212, 71, 0.55); }
+.tv-melody .tv-answer-key { color: #ffd447; }
+.tv-melody .tv-timer, .tv-melody .tv-timer-small { color: #ffd447; }
+.tv-melody .tv-timer.warning, .tv-melody .tv-timer-small.warning { color: #ff6b9d; }
+
+.melody-stage { flex: 1; padding: 1rem 1.25rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+.melody-scores { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.melody-score {
+  flex: 1 1 150px; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.8rem; border-radius: 8px;
+  background: linear-gradient(180deg, #2a1450, #170a33);
+  border: 2px solid #6b3fb0; color: #e4d6ff;
+}
+.melody-score.active { border-color: #ffd447; box-shadow: 0 0 0 3px rgba(255, 212, 71, 0.22); }
+.melody-score.out { opacity: 0.42; }
+.melody-score .name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.melody-score .pts { font-family: var(--font-display); font-weight: 700; color: #ffd447; font-variant-numeric: tabular-nums; }
+.melody-score .note, .melody-score .skip { font-size: 0.7rem; color: #c8b6ff; }
+.melody-score .skip { color: #ff9aa6; }
+
+.melody-rounds { flex-wrap: wrap; }
+.melody-rounds .tv-icon-btn.active { border-color: #ffd447; color: #ffd447; background: rgba(255, 212, 71, 0.16); }
+
+.melody-board { width: 100%; border-collapse: separate; border-spacing: 6px; }
+.melody-board th {
+  font-family: var(--font-display); font-size: clamp(0.72rem, 1.2vw, 0.95rem);
+  color: #fff; text-transform: uppercase; letter-spacing: 0.5px;
+  background: linear-gradient(180deg, #3a1b6e, #211040);
+  border: 2px solid #6b3fb0; border-radius: 6px; padding: 0.55rem 0.4rem;
+}
+.melody-board td { padding: 0; }
+.melody-cell {
+  width: 100%; min-height: 54px; padding: 0.7rem 0.4rem; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+  color: #ffd447;
+  background: linear-gradient(180deg, #341a63, #1a0b36);
+  border: 2px solid #6b3fb0; border-radius: 6px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.melody-cell:hover:not(:disabled) { border-color: #ffd447; transform: translateY(-1px); }
+.melody-cell.used { color: #4a3a6e; background: #0d0619; border-color: #2a1a4a; box-shadow: none; cursor: default; }
+.melody-cell:disabled { cursor: default; }
+
+.melody-current {
+  display: flex; flex-direction: column; gap: 0.7rem; align-items: center;
+  padding: 1rem 1.2rem; border-radius: 10px;
+  background: linear-gradient(180deg, rgba(52, 26, 99, 0.85), rgba(20, 8, 40, 0.95));
+  border: 2px solid #ffd447;
+  box-shadow: 0 0 0 6px rgba(255, 212, 71, 0.07), 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.melody-current-head { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; font-family: var(--font-display); letter-spacing: 1px; text-transform: uppercase; color: #ffd447; }
+.melody-prize { font-family: var(--font-display); font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 700; color: #ffd447; line-height: 1; text-shadow: 0 0 24px rgba(255, 212, 71, 0.4); font-variant-numeric: tabular-nums; }
+.melody-prize.warning { color: #ff6b9d; }
+.melody-hint { text-align: center; font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 700; color: #fff; padding: 0.4rem 0.8rem; border-left: 3px solid #ffd447; }
+.melody-buzzes, .melody-actions, .melody-answerer { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; align-items: center; }
+.melody-award { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.5rem; border: 1px solid #6b3fb0; border-radius: 8px; background: rgba(255, 255, 255, 0.05); }
+.melody-award b { font-size: 0.85rem; color: #e4d6ff; }
+.melody-actions .tv-icon-btn.ok, .melody-buzzes .tv-icon-btn.active, .melody-answerer .tv-icon-btn.active { border-color: #37d67a; color: #7dffb0; }
+.melody-actions .tv-icon-btn.bad { border-color: #ff5a6a; color: #ff9aa6; }
+.melody-revealed { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center; font-family: var(--font-display); font-size: clamp(1rem, 2vw, 1.3rem); color: #7dffb0; }
+.melody-revealed b { color: #7dffb0; }
+
+.melody-track-list { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.melody-track-btn {
+  padding: 0.6rem 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 700;
+  color: #ffd447; background: linear-gradient(180deg, #341a63, #1a0b36); border: 2px solid #6b3fb0;
+}
+.melody-track-btn:hover:not(:disabled) { border-color: #ffd447; }
+.melody-track-btn.used { opacity: 0.35; }
+.melody-track-btn.active { border-color: #ffd447; box-shadow: 0 0 0 3px rgba(255, 212, 71, 0.2); }
+.melody-bids { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+.melody-bid { display: flex; align-items: center; gap: 0.4rem; }
+.melody-bid span { font-size: 0.85rem; color: #e4d6ff; }
+.melody-bid .qm-input { width: 90px; }
+.melody-bids-screen { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.melody-screen-round { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; color: #ffd447; }
+.melody-screen-hint { text-align: center; font-size: clamp(1rem, 2vw, 1.3rem); color: #e4d6ff; padding: 0.6rem; }
+
+.melody-super { display: flex; flex-direction: column; gap: 0.7rem; }
+.melody-super-head { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.melody-super-track { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 0.8rem; border: 2px solid #6b3fb0; border-radius: 8px; background: rgba(255, 255, 255, 0.04); flex-wrap: wrap; }
+.melody-super-track.found { border-color: #37d67a; background: rgba(55, 214, 122, 0.08); }
+.melody-super-track .title { min-width: 160px; font-weight: 700; color: #e4d6ff; }
+.melody-super-audio { flex: 1 1 260px; max-width: 420px; }
+.melody-super-slots { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+.melody-super-slot {
+  width: 54px; height: 54px; display: grid; place-items: center; border-radius: 10px;
+  border: 2px solid #6b3fb0; background: #1a0b36; color: #8f77c9; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+}
+.melody-super-slot.found { border-color: #ffd447; color: #ffd447; background: rgba(255, 212, 71, 0.14); }
+
+/* ---------- Мелодия на телефоне ---------- */
+.player-melody { display: flex; flex-direction: column; gap: 0.8rem; }
+.player-melody-round { display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap; font-family: var(--font-display); letter-spacing: 1px; text-transform: uppercase; color: #ffd447; }
+.player-melody-audio { width: 100%; margin: 0; }
+.player-melody-hint { text-align: center; padding: 0.8rem; border: 1px dashed rgba(255, 212, 71, 0.55); border-radius: 12px; color: #fff; font-size: 1.05rem; }
+.player-melody-cat { text-align: center; color: #ffd447; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.player-melody-bids { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+.player-melody-super { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; color: #ffd447; text-align: center; font-variant-numeric: tabular-nums; }
+
 /* ---------- Мелкое ---------- */
 .qm-mono { font-variant-numeric: tabular-nums; }
 .qm-center { text-align: center; }

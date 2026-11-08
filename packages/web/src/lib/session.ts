@@ -11,6 +11,7 @@ import { db } from './firebase';
 import {
   generateJoinCode,
   generatePlayerToken,
+  melodySettings,
   normalizeCode,
   type Answer,
   type Game,
@@ -84,6 +85,15 @@ export async function createSession(game: Game, hostId: string): Promise<string>
     activeCellId: null,
     buzzedParticipantId: null,
     finalStage: null,
+    melodyRound: null,
+    melodyPrize: null,
+    melodyPrizeStartedAt: null,
+    melodyPoints: null,
+    melodyBids: null,
+    melodySkips: null,
+    melodyOut: null,
+    melodySuper: null,
+    melodyConfig: game.type === 'melody' ? melodySettings(game.settings) : null,
   });
   await setDoc(doc(db, 'joinCodes', code), { sessionId: ref.id, hostId });
   return ref.id;

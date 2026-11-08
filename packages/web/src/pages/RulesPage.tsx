@@ -7,7 +7,7 @@ export default function RulesPage() {
         <div>
           <div className="qm-eyebrow">Свод правил</div>
           <h1 className="qm-title">Как играть</h1>
-          <p className="qm-subtitle">Кратко о двух форматах и о том, как работает сессия.</p>
+          <p className="qm-subtitle">Кратко о трёх форматах и о том, как работает сессия.</p>
         </div>
         <Link className="qm-btn qm-btn-ghost" to="/join">Присоединиться</Link>
       </div>
@@ -43,6 +43,26 @@ export default function RulesPage() {
         <p>Верный ответ прибавляет стоимость, неверный — вычитает. Соперники могут перехватить ответ.</p>
         <p><b>«Кот в мешке»</b> — вопрос передаётся сопернику. <b>«Аукцион»</b> — ставка, возможен ва-банк. <b>Финал</b> — темы, ставки, один вопрос.</p>
         <p className="qm-small">Источник: <a className="qm-link" href="https://kknights.com/posts/3723-svoia-igra-instruktsiia-dlia-igroka" target="_blank" rel="noreferrer">kknights.com</a></p>
+      </section>
+
+      <section className="qm-card" id="melody">
+        <div className="qm-eyebrow">Формат 3</div>
+        <h2 className="qm-title">Угадай мелодию</h2>
+        <p>Три игрока, три тура и суперигра. Игроки слушают фрагменты без слов и первыми нажимают кнопку.</p>
+        <div className="qm-grid qm-grid-4 qm-mt">
+          <div className="qm-stat"><b>4</b><span>категории</span></div>
+          <div className="qm-stat"><b>16</b><span>«нот» в туре</span></div>
+          <div className="qm-stat"><b>3</b><span>очка для финала</span></div>
+          <div className="qm-stat"><b>7</b><span>мелодий за 30 с</span></div>
+        </div>
+        <h3 className="qm-mt">Туры</h3>
+        <p className="qm-small">
+          <b>1 тур</b> — четыре категории по четыре ноты стоимостью 15–100. Ошибся — пропускаешь две мелодии.<br />
+          <b>2 тур</b> — приз растёт каждую секунду, пока звучит музыка. После тура выбывает игрок с меньшим счётом.<br />
+          <b>3 тур</b> — ведущий даёт подсказку, игроки торгуются, с трёх–семи нот угадают. Кто первым наберёт 3 очка — в суперигру.<br />
+          <b>Суперигра</b> — семь мелодий за 30 секунд. Все семь — бонус к призу.
+        </p>
+        <p className="qm-small">Источник: <a className="qm-link" href="https://ugadaj-melodiyu.narod.ru/" target="_blank" rel="noreferrer">ugadaj-melodiyu.narod.ru</a></p>
       </section>
 
       <section className="qm-card">

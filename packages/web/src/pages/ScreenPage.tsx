@@ -11,6 +11,8 @@ import {
   type Session,
 } from '@quizmaster/shared';
 import { IconCat, IconGavel } from '../components/icons';
+import MelodyScreen from '../components/MelodyScreen';
+import { QuestionAudio, QuestionImage } from '../components/QuestionMedia';
 
 export default function ScreenPage() {
   const { sessionId } = useParams();
@@ -50,10 +52,11 @@ export default function ScreenPage() {
   }
 
   const isMillionaire = session.gameType === 'millionaire';
+  const isMelody = session.gameType === 'melody';
   const title = session.gameTitle || 'QuizMaster';
 
   return (
-    <div className={`tv ${isMillionaire ? 'tv-millionaire' : 'tv-svoya'}`} role="main">
+    <div className={`tv ${isMillionaire ? 'tv-millionaire' : isMelody ? 'tv-melody' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <span className="tv-logo">{title}</span>
@@ -83,6 +86,8 @@ export default function ScreenPage() {
         <ScreenResults participants={participants} />
       ) : isMillionaire ? (
         <MillionaireScreen session={session} participants={participants} />
+      ) : isMelody ? (
+        <MelodyScreen session={session} participants={participants} />
       ) : (
         <SvoyaScreen session={session} participants={participants} />
       )}
@@ -161,8 +166,12 @@ function MillionaireScreen({ session, participants }: { session: Session; partic
               Играет: {player?.name ?? '…'} · вопрос {currentIdx + 1} из 15
             </div>
             <div className="millionaire-question">{pq.text}</div>
-            {pq.imageUrl && <img className="tv-media" src={pq.imageUrl} alt="" />}
-            {pq.audioUrl && <audio className="tv-audio" controls src={pq.audioUrl} />}
+            {(pq.imageUrl || pq.imageMediaId) && (
+              <QuestionImage className="tv-media" mediaId={pq.imageMediaId} src={pq.imageUrl} />
+            )}
+            {(pq.audioUrl || pq.audioMediaId) && (
+              <QuestionAudio className="tv-audio" mediaId={pq.audioMediaId} src={pq.audioUrl} />
+            )}
             <div className="millionaire-answers">
               {(pq.options ?? []).map((text, i) => {
                 const hidden = turn.fiftyOptions?.length ? !turn.fiftyOptions.includes(i) : false;
@@ -302,8 +311,12 @@ function SvoyaScreen({ session, participants }: { session: Session; participants
             </span>
             {pq.text}
           </div>
-          {pq.imageUrl && <img className="tv-media" src={pq.imageUrl} alt="" />}
-          {pq.audioUrl && <audio className="tv-audio" controls src={pq.audioUrl} />}
+          {(pq.imageUrl || pq.imageMediaId) && (
+            <QuestionImage className="tv-media" mediaId={pq.imageMediaId} src={pq.imageUrl} />
+          )}
+          {(pq.audioUrl || pq.audioMediaId) && (
+            <QuestionAudio className="tv-audio" mediaId={pq.audioMediaId} src={pq.audioUrl} />
+          )}
           {session.catRecipientId && (
             <div className="svoya-round-title">
               Кот у: {participants.find((p) => p.id === session.catRecipientId)?.name}

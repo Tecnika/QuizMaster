@@ -4,12 +4,13 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import {
+  MELODY_DEFAULT_SETTINGS,
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
   SVOYA_DEFAULT_ROUNDS,
   type GameType,
 } from '@quizmaster/shared';
-import { IconBrain, IconCoins } from '../components/icons';
+import { IconBrain, IconCoins, IconMusic } from '../components/icons';
 
 export default function NewGamePage() {
   const navigate = useNavigate();
@@ -33,7 +34,9 @@ export default function NewGamePage() {
       const now = new Date().toISOString();
       const settings = type === 'millionaire'
         ? { ladder: MILLIONAIRE_LADDER, safeHavens: MILLIONAIRE_SAFE_HAVENS, timeLimitSeconds: 60 }
-        : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false, timeLimitSeconds: 60 };
+        : type === 'melody'
+          ? { melody: MELODY_DEFAULT_SETTINGS, timeLimitSeconds: 0 }
+          : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false, timeLimitSeconds: 60 };
       const ref = await addDoc(collection(db, 'games'), {
         title: title.trim(),
         description: description.trim(),
@@ -98,6 +101,16 @@ export default function NewGamePage() {
               <div className="icon"><IconBrain size={32} /></div>
               <h2>Своя игра</h2>
               <p>Табло тем и стоимостей, раунды, «Кот в мешке», «Аукцион», финал.</p>
+            </button>
+            <button
+              type="button"
+              className="qm-card qm-feature"
+              onClick={() => setType('melody')}
+              style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'melody' ? 'var(--green)' : undefined, boxShadow: type === 'melody' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
+            >
+              <div className="icon"><IconMusic size={32} /></div>
+              <h2>Угадай мелодию</h2>
+              <p>Четыре тура, растущий приз, торги с нот и суперигра. Нужны аудиофрагменты.</p>
             </button>
           </div>
 

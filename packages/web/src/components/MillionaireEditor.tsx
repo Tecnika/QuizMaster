@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { MILLIONAIRE_LADDER, MILLIONAIRE_SAFE_HAVENS, type Question } from '@quizmaster/shared';
+import MediaField from './MediaField';
 
 interface Props {
   gameId: string;
@@ -54,6 +55,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
   const [comment, setComment] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
+  const [imageMediaId, setImageMediaId] = useState('');
+  const [audioMediaId, setAudioMediaId] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -67,6 +70,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       setComment(question.comment || '');
       setImageUrl(question.imageUrl || '');
       setAudioUrl(question.audioUrl || '');
+      setImageMediaId(question.imageMediaId || '');
+      setAudioMediaId(question.audioMediaId || '');
     } else {
       setText('');
       setOptions(['', '', '', '']);
@@ -74,6 +79,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       setComment('');
       setImageUrl('');
       setAudioUrl('');
+      setImageMediaId('');
+      setAudioMediaId('');
     }
   }, [question?.id]);
 
@@ -98,6 +105,8 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
       comment: comment.trim(),
       imageUrl: imageUrl.trim(),
       audioUrl: audioUrl.trim(),
+      imageMediaId: imageMediaId || '',
+      audioMediaId: audioMediaId || '',
     };
     try {
       if (question) {
@@ -152,7 +161,7 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
             <div style={{ fontWeight: 700, marginBottom: '0.3rem' }}>{question.text}</div>
             <div className="qm-small">
               Верно: <b>{'ABCD'[question.correctIndex ?? 0]}</b> — {question.options?.[question.correctIndex ?? 0]}
-              {(question.imageUrl || question.audioUrl) && <span className="qm-badge" style={{ marginLeft: 8 }}>медиа</span>}
+              {(question.imageUrl || question.audioUrl || question.imageMediaId || question.audioMediaId) && <span className="qm-badge" style={{ marginLeft: 8 }}>медиа</span>}
             </div>
           </div>
         ) : (
@@ -197,25 +206,21 @@ function Slot({ index, question, gameId }: { index: number; question?: Question;
             />
           </div>
           <div className="qm-row">
-            <div className="qm-field">
-              <label className="qm-label">Картинка (URL)</label>
-              <input
-                className="qm-input" value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://…/image.jpg"
-              />
-            </div>
-            <div className="qm-field">
-              <label className="qm-label">Аудио (URL)</label>
-              <input
-                className="qm-input" value={audioUrl}
-                onChange={(e) => setAudioUrl(e.target.value)}
-                placeholder="https://…/audio.mp3"
-              />
-            </div>
+            <MediaField
+              kind="image"
+              label="Картинка"
+              mediaId={imageMediaId}
+              url={imageUrl}
+              onChange={({ mediaId, url }) => { setImageMediaId(mediaId); setImageUrl(url); }}
+            />
+            <MediaField
+              kind="audio"
+              label="Аудио"
+              mediaId={audioMediaId}
+              url={audioUrl}
+              onChange={({ mediaId, url }) => { setAudioMediaId(mediaId); setAudioUrl(url); }}
+            />
           </div>
-          {imageUrl && <img className="qm-media-preview" src={imageUrl} alt="" />}
-          {audioUrl && <audio className="qm-audio-preview" controls src={audioUrl} />}
           {error && <p className="qm-danger-text">{error}</p>}
           <div className="qm-inline">
             <button className="qm-btn qm-btn-primary" onClick={() => void save()} disabled={saving}>

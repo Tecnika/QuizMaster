@@ -8,6 +8,7 @@ import {
   type QuestionKind,
 } from '@quizmaster/shared';
 import { IconCat, IconCheck, IconGavel, IconPuzzle } from './icons';
+import MediaField from './MediaField';
 
 interface Props {
   gameId: string;
@@ -34,6 +35,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
   const [comment, setComment] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
+  const [imageMediaId, setImageMediaId] = useState('');
+  const [audioMediaId, setAudioMediaId] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -53,6 +56,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
     setComment('');
     setImageUrl('');
     setAudioUrl('');
+    setImageMediaId('');
+    setAudioMediaId('');
     setKind('normal');
     setError('');
   };
@@ -79,6 +84,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
       comment: comment.trim(),
       imageUrl: imageUrl.trim(),
       audioUrl: audioUrl.trim(),
+      imageMediaId: imageMediaId || '',
+      audioMediaId: audioMediaId || '',
     };
     try {
       if (editingId) {
@@ -108,6 +115,8 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
     setComment(q.comment ?? '');
     setImageUrl(q.imageUrl ?? '');
     setAudioUrl(q.audioUrl ?? '');
+    setImageMediaId(q.imageMediaId ?? '');
+    setAudioMediaId(q.audioMediaId ?? '');
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -224,25 +233,21 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
           </div>
         </div>
         <div className="qm-row">
-          <div className="qm-field">
-            <label className="qm-label">Картинка (URL)</label>
-            <input
-              className="qm-input" value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://…/image.jpg"
-            />
-          </div>
-          <div className="qm-field">
-            <label className="qm-label">Аудио (URL)</label>
-            <input
-              className="qm-input" value={audioUrl}
-              onChange={(e) => setAudioUrl(e.target.value)}
-              placeholder="https://…/audio.mp3"
-            />
-          </div>
+          <MediaField
+            kind="image"
+            label="Картинка"
+            mediaId={imageMediaId}
+            url={imageUrl}
+            onChange={({ mediaId, url }) => { setImageMediaId(mediaId); setImageUrl(url); }}
+          />
+          <MediaField
+            kind="audio"
+            label="Аудио"
+            mediaId={audioMediaId}
+            url={audioUrl}
+            onChange={({ mediaId, url }) => { setAudioMediaId(mediaId); setAudioUrl(url); }}
+          />
         </div>
-        {imageUrl && <img className="qm-media-preview" src={imageUrl} alt="" />}
-        {audioUrl && <audio className="qm-audio-preview" controls src={audioUrl} />}
 
         {error && <p className="qm-danger-text">{error}</p>}
         <div className="qm-inline">
@@ -322,7 +327,7 @@ export default function SvoyaEditor({ gameId, questions, settings, onUpdateSetti
                           <span className={`qm-badge ${q.kind === 'cat' ? 'qm-badge-gold' : q.kind === 'auction' ? 'qm-badge-red' : ''}`}>
                             {kindLabel[q.kind ?? 'normal']}
                           </span>
-                          {(q.imageUrl || q.audioUrl) && <span className="qm-badge qm-badge-blue">медиа</span>}
+                          {(q.imageUrl || q.audioUrl || q.imageMediaId || q.audioMediaId) && <span className="qm-badge qm-badge-blue">медиа</span>}
                         </div>
                         <div className="qm-inline">
                           <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => edit(q)}>Изменить</button>

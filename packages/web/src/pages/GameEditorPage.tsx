@@ -11,9 +11,10 @@ import {
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
-import { checkGameStart } from '../lib/gameStart';
+import { checkGameStart, countMelodyRounds } from '../lib/gameStart';
 import MillionaireEditor from '../components/MillionaireEditor';
 import SvoyaEditor from '../components/SvoyaEditor';
+import MelodyEditor from '../components/MelodyEditor';
 import type { Game, GameSettings, Question } from '@quizmaster/shared';
 
 export default function GameEditorPage() {
@@ -95,7 +96,7 @@ export default function GameEditorPage() {
     setStarting(true);
     setError('');
     try {
-      const check = checkGameStart(game, questions.length);
+      const check = checkGameStart(game, questions.length, countMelodyRounds(questions));
       if (check.blocking) {
         setError(check.message || 'В игре нет вопросов');
         return;
@@ -118,13 +119,15 @@ export default function GameEditorPage() {
         <div className="qm-page-head">
           <div>
             <div className="qm-eyebrow">
-              {game.type === 'millionaire' ? 'Миллионер' : 'Своя игра'} · редактор
+              {game.type === 'millionaire' ? 'Миллионер' : game.type === 'melody' ? 'Угадай мелодию' : 'Своя игра'} · редактор
             </div>
             <h1 className="qm-title">{game.title}</h1>
             <p className="qm-subtitle">
               {game.type === 'millionaire'
                 ? 'Заполните 15 вопросов лестницы.'
-                : 'Соберите табло: раунды, темы и стоимости.'}
+                : game.type === 'melody'
+                  ? 'Соберите мелодии: четыре тура и суперигра.'
+                  : 'Соберите табло: раунды, темы и стоимости.'}
             </p>
           </div>
           <div className="qm-inline">
@@ -181,6 +184,13 @@ export default function GameEditorPage() {
 
       {game.type === 'millionaire' ? (
         <MillionaireEditor gameId={game.id} questions={questions} />
+      ) : game.type === 'melody' ? (
+        <MelodyEditor
+          gameId={game.id}
+          questions={questions}
+          settings={game.settings || {}}
+          onUpdateSettings={updateSettings}
+        />
       ) : (
         <SvoyaEditor
           gameId={game.id}

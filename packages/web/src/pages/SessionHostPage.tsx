@@ -15,11 +15,14 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { useCountdown } from '../lib/useCountdown';
 import { IconCat, IconCheck, IconGavel } from '../components/icons';
+import MelodyHost from '../components/MelodyHost';
+import { QuestionAudio, QuestionImage } from '../components/QuestionMedia';
 import {
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
   applySvoyaScore,
   buildBoard,
+  buildMelodyBoard,
   emptyTurn,
   fiftyFiftyOptions,
   formatCountdown,
@@ -42,6 +45,8 @@ function toPublic(q: Question): PublicQuestion {
   if (q.options) out.options = q.options;
   if (q.imageUrl) out.imageUrl = q.imageUrl;
   if (q.audioUrl) out.audioUrl = q.audioUrl;
+  if (q.imageMediaId) out.imageMediaId = q.imageMediaId;
+  if (q.audioMediaId) out.audioMediaId = q.audioMediaId;
   if (q.round != null) out.round = q.round;
   if (q.theme) out.theme = q.theme;
   if (q.value != null) out.value = q.value;
@@ -183,6 +188,19 @@ export default function SessionHostPage() {
       const patch: Record<string, unknown> = { status: 'active' };
       if (session.gameType === 'svoya') {
         patch.board = buildBoard(questions);
+      }
+      if (session.gameType === 'melody') {
+        patch.board = buildMelodyBoard(questions);
+        patch.melodyRound = 1;
+        patch.melodyPoints = {};
+        patch.melodySkips = {};
+        patch.melodyOut = [];
+        patch.melodySuper = null;
+        patch.melodyPrize = null;
+        patch.melodyPrizeStartedAt = null;
+        patch.melodyBids = null;
+        patch.activeCellId = null;
+        patch.publicQuestion = null;
       }
       if (session.gameType === 'millionaire') {
         patch.turn = null;
@@ -455,7 +473,7 @@ export default function SessionHostPage() {
   };
 
   return (
-    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : 'tv-svoya'}`} role="main">
+    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : session.gameType === 'melody' ? 'tv-melody' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <Link to="/cabinet" className="tv-icon-btn">← Кабинет</Link>
@@ -563,11 +581,11 @@ export default function SessionHostPage() {
                 {session.publicQuestion && (
                   <>
                     <div className="millionaire-question">{session.publicQuestion.text}</div>
-                    {session.publicQuestion.imageUrl && (
-                      <img className="tv-media" src={session.publicQuestion.imageUrl} alt="" />
+                    {(session.publicQuestion.imageUrl || session.publicQuestion.imageMediaId) && (
+                      <QuestionImage className="tv-media" mediaId={session.publicQuestion.imageMediaId} src={session.publicQuestion.imageUrl} />
                     )}
-                    {session.publicQuestion.audioUrl && (
-                      <audio className="tv-audio" controls src={session.publicQuestion.audioUrl} />
+                    {(session.publicQuestion.audioUrl || session.publicQuestion.audioMediaId) && (
+                      <QuestionAudio className="tv-audio" mediaId={session.publicQuestion.audioMediaId} src={session.publicQuestion.audioUrl} />
                     )}
                     <div className="millionaire-answers">
                       {(session.publicQuestion.options ?? []).map((text, i) => {
@@ -752,11 +770,11 @@ export default function SessionHostPage() {
               {session.publicQuestion.text}
             </div>
           )}
-          {session.publicQuestion?.imageUrl && (
-            <img className="tv-media" src={session.publicQuestion.imageUrl} alt="" />
+          {(session.publicQuestion?.imageUrl || session.publicQuestion?.imageMediaId) && (
+            <QuestionImage className="tv-media" mediaId={session.publicQuestion.imageMediaId} src={session.publicQuestion.imageUrl} />
           )}
-          {session.publicQuestion?.audioUrl && (
-            <audio className="tv-audio" controls src={session.publicQuestion.audioUrl} />
+          {(session.publicQuestion?.audioUrl || session.publicQuestion?.audioMediaId) && (
+            <QuestionAudio className="tv-audio" mediaId={session.publicQuestion.audioMediaId} src={session.publicQuestion.audioUrl} />
           )}
           {currentQuestion && <div className="tv-answer-key">Ответ ведущего: {currentQuestion.answer}</div>}
 
@@ -857,6 +875,19 @@ export default function SessionHostPage() {
             </>
           )}
         </div>
+      )}
+
+      {session.status === 'active' && session.gameType === 'melody' && sessionId && game && (
+        <MelodyHost
+          session={session}
+          sessionId={sessionId}
+          game={game}
+          participants={participants}
+          questions={questions}
+          answers={answers}
+          onPatch={patchSession}
+          onFinish={finishGame}
+        />
       )}
 
       {session.status === 'finished' && (

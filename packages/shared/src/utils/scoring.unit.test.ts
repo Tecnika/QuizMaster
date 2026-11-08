@@ -6,6 +6,16 @@ import {
   fiftyFiftyOptions,
 } from './millionaire';
 import { applySvoyaScore, buildBoard, clampFinalBet, svoyaWinners } from './svoya';
+import {
+  MELODY_DEFAULT_SETTINGS,
+  MELODY_SUPER_TRACKS,
+  buildMelodyBoard,
+  melodyBiddingWinner,
+  melodyLowestScorers,
+  melodyPrizeAt,
+  melodySettings,
+  melodySuperWon,
+} from './melody';
 import { generateJoinCode, generatePlayerToken, normalizeCode } from './code';
 import type { Question } from '../types';
 
@@ -96,5 +106,51 @@ describe('code', () => {
 
   it('normalizes a join code', () => {
     expect(normalizeCode(' ab-c12 ')).toBe('ABC12');
+  });
+});
+
+describe('melody', () => {
+  it('grows the second-round prize by the configured rate', () => {
+    const started = 1_000_000;
+    expect(melodyPrizeAt(50, 3, started, started)).toBe(50);
+    expect(melodyPrizeAt(50, 3, started, started + 1_000)).toBe(53);
+    expect(melodyPrizeAt(50, 3, started, started + 10_900)).toBe(80);
+    expect(melodyPrizeAt(50, 3, null)).toBe(50);
+  });
+
+  it('falls back to default settings', () => {
+    const settings = melodySettings({});
+    expect(settings.categories).toHaveLength(4);
+    expect(settings.startPrize).toBe(MELODY_DEFAULT_SETTINGS.startPrize);
+    expect(settings.round1Values).toEqual([15, 30, 50, 100]);
+  });
+
+  it('builds the melody board in the authored order', () => {
+    const questions: Question[] = [
+      { id: 'r2', order: 101, text: '', answer: 'A', round: 2, theme: 'Кино', value: 50 },
+      { id: 'r1b', order: 2, text: '', answer: 'B', round: 1, theme: 'Кино', value: 30 },
+      { id: 'r1a', order: 1, text: '', answer: 'C', round: 1, theme: 'Кино', value: 15 },
+      { id: 'r4', order: 300, text: '', answer: 'D', round: 4, theme: 'Суперигра', value: 0 },
+    ];
+    const board = buildMelodyBoard(questions);
+    expect(board.map((c) => c.questionId)).toEqual(['r1a', 'r1b', 'r2', 'r4']);
+    expect(board.at(-1)!.theme).toBe('Суперигра');
+  });
+
+  it('picks the lowest scorers for elimination', () => {
+    const out = melodyLowestScorers([
+      { id: 'a', name: 'A', score: 100, color: '#fff' },
+      { id: 'b', name: 'B', score: 30, color: '#fff' },
+      { id: 'c', name: 'C', score: 30, color: '#fff' },
+    ]);
+    expect(out).toEqual(['b', 'c']);
+    expect(melodyLowestScorers([{ id: 'a', name: 'A', score: 0, color: '#fff' }])).toEqual([]);
+  });
+
+  it('detects the bidding winner and the supergame', () => {
+    expect(melodyBiddingWinner({ a: 2, b: 3 }, 3)).toBe('b');
+    expect(melodyBiddingWinner({ a: 1, b: 2 }, 3)).toBeNull();
+    expect(melodySuperWon(Array.from({ length: MELODY_SUPER_TRACKS }, (_, i) => `t${i}`))).toBe(true);
+    expect(melodySuperWon(['t1'])).toBe(false);
   });
 });

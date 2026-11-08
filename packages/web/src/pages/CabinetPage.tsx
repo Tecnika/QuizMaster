@@ -4,10 +4,9 @@ import { collection, query, where, deleteDoc, doc, getDocs } from 'firebase/fire
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
-import { checkGameStart } from '../lib/gameStart';
-import { IconBrain, IconCoins, IconFolder, IconPlus } from '../components/icons';
-import type { Game } from '@quizmaster/shared';
-
+import { checkGameStart, countMelodyRounds } from '../lib/gameStart';
+import { IconBrain, IconCoins, IconFolder, IconMusic, IconPlus } from '../components/icons';
+import type { Game, Question } from '@quizmaster/shared';
 export default function CabinetPage() {
   const { user, userLogin } = useAuth();
   const navigate = useNavigate();
@@ -44,7 +43,8 @@ export default function CabinetPage() {
     setBusyId(game.id);
     try {
       const qs = await getDocs(collection(db, 'games', game.id, 'questions'));
-      const check = checkGameStart(game, qs.size);
+      const all = qs.docs.map((d) => ({ id: d.id, ...d.data() })) as Question[];
+      const check = checkGameStart(game, qs.size, countMelodyRounds(all));
       if (check.blocking) {
         setError(check.message || 'В игре нет вопросов');
         return;
@@ -95,12 +95,16 @@ export default function CabinetPage() {
               <div className="qm-game">
                 <div className="qm-game-main">
                   <div className={`qm-game-icon${game.type === 'svoya' ? ' svoya' : ''}`}>
-                    {game.type === 'millionaire' ? <IconCoins size={26} /> : <IconBrain size={26} />}
+                    {game.type === 'millionaire'
+                      ? <IconCoins size={26} />
+                      : game.type === 'melody' ? <IconMusic size={26} /> : <IconBrain size={26} />}
                   </div>
                   <div>
                     <div className="qm-card-title">{game.title}</div>
                     <div className="qm-card-muted">
-                      {game.type === 'millionaire' ? 'Кто хочет стать миллионером?' : 'Своя игра'}
+                      {game.type === 'millionaire'
+                        ? 'Кто хочет стать миллионером?'
+                        : game.type === 'melody' ? 'Угадай мелодию' : 'Своя игра'}
                       {' · '}
                       <span className={`qm-badge ${game.status === 'ready' ? 'qm-badge-green' : 'qm-badge-gold'}`}>
                         {game.status === 'ready' ? 'готова' : game.status === 'archived' ? 'в архиве' : 'черновик'}

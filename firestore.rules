@@ -48,6 +48,22 @@ service cloud.firestore {
       }
     }
 
+    // Медиатека: файлы вопросов (картинки и аудио) в виде data URL.
+    // Читать может любой участник/экран, писать — только автор файла.
+    match /media/{mediaId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.authorId == uid()
+        && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.size() <= 850000;
+      allow update: if signedIn()
+        && resource.data.authorId == uid()
+        && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.size() <= 850000;
+      allow delete: if signedIn() && resource.data.authorId == uid();
+    }
+
     // Коды подключения: публичный get по коду
     match /joinCodes/{code} {
       allow get: if true;

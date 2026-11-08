@@ -8,6 +8,8 @@ import {
 } from '../lib/session';
 import { useCountdown } from '../lib/useCountdown';
 import { IconCheck, IconCross } from '../components/icons';
+import MelodyPlayer from '../components/MelodyPlayer';
+import { QuestionImage } from '../components/QuestionMedia';
 import { formatCountdown, type Participant, type Session } from '@quizmaster/shared';
 
 export default function PlayerPage() {
@@ -62,6 +64,7 @@ export default function PlayerPage() {
   }
 
   const isMillionaire = session.gameType === 'millionaire';
+  const isMelody = session.gameType === 'melody';
   const turn = session.turn;
   const myTurn = isMillionaire && turn?.participantId === me.id;
   const question = session.publicQuestion;
@@ -105,7 +108,7 @@ export default function PlayerPage() {
       <div className="player-head">
         <div className="qm-inline" style={{ justifyContent: 'space-between' }}>
           <span className="tv-logo" style={{ color: '#ffd447' }}>
-            {isMillionaire ? 'Миллионер' : 'Своя игра'}
+            {isMillionaire ? 'Миллионер' : isMelody ? 'Угадай мелодию' : 'Своя игра'}
           </span>
           <span className="player-code">{session.code}</span>
         </div>
@@ -157,7 +160,9 @@ export default function PlayerPage() {
           {myTurn && question && (
             <>
               <div className="player-question">{question.text}</div>
-              {question.imageUrl && <img className="player-media" src={question.imageUrl} alt="" />}
+              {(question.imageUrl || question.imageMediaId) && (
+                <QuestionImage className="player-media" mediaId={question.imageMediaId} src={question.imageUrl} />
+              )}
               {question.audioUrl && <div className="player-audio-note">Аудио-вопрос озвучивает ведущий</div>}
 
               {turn?.status === 'answering' && (
@@ -209,7 +214,18 @@ export default function PlayerPage() {
         </div>
       )}
 
-      {session.status === 'active' && !isMillionaire && (
+      {session.status === 'active' && isMelody && (
+        <MelodyPlayer
+          session={session}
+          participants={participants}
+          me={me}
+          settings={session.melodyConfig ?? undefined}          sent={sent}
+          expired={expired}
+          onBuzz={() => void send({ type: 'buzz' })}
+        />
+      )}
+
+      {session.status === 'active' && !isMillionaire && !isMelody && (
         <div>
           {!question && (
             <div className="player-status">Ведущий выбирает вопрос на табло.</div>
@@ -225,7 +241,9 @@ export default function PlayerPage() {
                 </div>
                 {question.text}
               </div>
-              {question.imageUrl && <img className="player-media" src={question.imageUrl} alt="" />}
+              {(question.imageUrl || question.imageMediaId) && (
+                <QuestionImage className="player-media" mediaId={question.imageMediaId} src={question.imageUrl} />
+              )}
               {question.audioUrl && <div className="player-audio-note">Аудио-вопрос озвучивает ведущий</div>}
 
               {catHidden && <div className="player-status">Ведущий решает, кому передать кота.</div>}

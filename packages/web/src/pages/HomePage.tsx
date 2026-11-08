@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { IconBrain, IconBulb, IconController, IconTrophy } from '../components/icons';
+import { IconBrain, IconBulb, IconController, IconMusic, IconTrophy } from '../components/icons';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -12,8 +12,8 @@ export default function HomePage() {
         <div className="qm-eyebrow" style={{ color: '#e6c458' }}>Конструктор викторин</div>
         <h1>Собери свою игру</h1>
         <p>
-          Создавай вопросы, запускай сессии и играй с друзьями в «Кто хочет стать миллионером?»
-          и «Свою игру». Участникам не нужен аккаунт — только код комнаты.
+          Создавай вопросы, запускай сессии и играй с друзьями в «Кто хочет стать миллионером?»,
+          «Свою игру» и «Угадай мелодию». Участникам не нужен аккаунт — только код комнаты.
         </p>
         <div className="qm-hero-actions">
           <Link className="qm-btn qm-btn-gold qm-btn-lg" to={user ? '/cabinet' : '/register'}>
@@ -37,6 +37,12 @@ export default function HomePage() {
           <h2>Своя игра</h2>
           <p>Табло с темами и стоимостями, раунды, «Кот в мешке», «Аукцион» и финал. Команды выбирают вопрос и отвечают.</p>
           <p className="qm-mt"><Link className="qm-link" to="/rules#svoya">Правила →</Link></p>
+        </div>
+        <div className="qm-card qm-feature">
+          <div className="icon"><IconMusic size={32} /></div>
+          <h2>Угадай мелодию</h2>
+          <p>Четыре тура: «ноты» с категориями, растущий приз, торги с трёх–семи нот и суперигра.</p>
+          <p className="qm-mt"><Link className="qm-link" to="/rules#melody">Правила →</Link></p>
         </div>
         <div className="qm-card qm-feature">
           <div className="icon"><IconController size={32} /></div>
