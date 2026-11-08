@@ -85,7 +85,7 @@ export default function QuizScreen({
           {session.revealedAnswer ? (
             <div className="quiz-answer">Ответ: <b>{session.revealedAnswer}</b></div>
           ) : (
-            <div className="quiz-screen-hint">Ответы — на бланках. Ведущий объявит результат.</div>
+            <div className="quiz-screen-hint">Команды отправляют ответы с телефонов. Ведущий объявит результат.</div>
           )}
         </>
       ) : (
