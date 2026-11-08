@@ -53,6 +53,7 @@ media/{mediaId}                    dataUrl, kind, authorId, name, mime, size
 - «Миллионер»: тёмно-синий/фиолетовый зал, золото, лестница, варианты-плитки (`.tv-millionaire`).
 - «Своя игра»: синий зал, золотое табло (`.tv-svoya`).
 - «Угадай мелодию»: сливовый зал, золотые ноты и растущий приз (`.tv-melody`).
+- «Классический квиз»: тёмно-зелёный паб-квиз, золото и бирюза (`.tv-quiz`).
 - Экраны игроков — отдельный мобильный стиль (`.player-screen`).
 
 ## Key modules
@@ -65,6 +66,7 @@ media/{mediaId}                    dataUrl, kind, authorId, name, mime, size
 | Millionaire logic | `packages/shared/src/utils/millionaire.ts` | Лестница, несгораемые, 50/50 |
 | Svoya logic | `packages/shared/src/utils/svoya.ts` | Табло, очки, финал |
 | Melody logic | `packages/shared/src/utils/melody.ts` | Туры, растущий приз, торги, суперигра |
+| Quiz logic | `packages/shared/src/utils/quiz.ts` | 7 раундов, очки, казино, бонус |
 | Media library | `packages/web/src/lib/media.ts` | Сжатие картинок, загрузка файлов в Firestore |
 | Media fields | `packages/web/src/components/MediaField.tsx` | Загрузка файла или ссылка, превью |
 | Codes | `packages/shared/src/utils/code.ts` | Коды комнат и токены |

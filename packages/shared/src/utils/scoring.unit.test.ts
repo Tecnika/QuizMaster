@@ -16,6 +16,15 @@ import {
   melodySettings,
   melodySuperWon,
 } from './melody';
+import {
+  QUIZ_DEFAULT_ROUNDS,
+  QUIZ_DEFAULT_SETTINGS,
+  QUIZ_TOTAL_QUESTIONS,
+  quizPairsLabel,
+  quizScores,
+  quizSettings,
+  quizRoundSlots,
+} from './quiz';
 import { generateJoinCode, generatePlayerToken, normalizeCode } from './code';
 import type { Question } from '../types';
 
@@ -152,5 +161,70 @@ describe('melody', () => {
     expect(melodyBiddingWinner({ a: 1, b: 2 }, 3)).toBeNull();
     expect(melodySuperWon(Array.from({ length: MELODY_SUPER_TRACKS }, (_, i) => `t${i}`))).toBe(true);
     expect(melodySuperWon(['t1'])).toBe(false);
+  });
+});
+
+describe('quiz', () => {
+  const participants = [
+    { id: 'a', name: 'A', score: 0, color: '#fff' },
+    { id: 'b', name: 'B', score: 0, color: '#fff' },
+  ];
+
+  it('has the classic seven-round structure', () => {
+    expect(QUIZ_DEFAULT_ROUNDS).toHaveLength(7);
+    expect(QUIZ_TOTAL_QUESTIONS).toBe(51);
+    expect(quizRoundSlots(QUIZ_DEFAULT_ROUNDS[4])).toBe(6);
+    expect(quizSettings({}).bonusPoints).toBe(QUIZ_DEFAULT_SETTINGS.bonusPoints);
+  });
+
+  it('awards round points for correct answers', () => {
+    const questions: Question[] = [
+      { id: 'q1', order: 1, text: 'q', answer: 'a', quizRound: 1 },
+      { id: 'q2', order: 2, text: 'q', answer: 'a', quizRound: 1 },
+    ];
+    const scores = quizScores({
+      questions,
+      marks: { q1: { a: true, b: false }, q2: { a: true } },
+      bets: null,
+      settings: QUIZ_DEFAULT_SETTINGS,
+      participants,
+    });
+    expect(scores).toEqual({ a: 2, b: 0 });
+  });
+
+  it('adds and subtracts casino bets', () => {
+    const questions: Question[] = [
+      { id: 'c1', order: 1, text: 'q', answer: 'a', quizRound: 7 },
+      { id: 'c2', order: 2, text: 'q', answer: 'a', quizRound: 7 },
+    ];
+    const scores = quizScores({
+      questions,
+      marks: { c1: { a: true, b: false }, c2: { a: false, b: true } },
+      bets: { c1: { a: 10, b: 5 }, c2: { a: 5, b: 20 } },
+      settings: QUIZ_DEFAULT_SETTINGS,
+      participants,
+    });
+    expect(scores).toEqual({ a: 5, b: 15 });
+  });
+
+  it('gives the backstage bonus separately', () => {
+    const questions: Question[] = [
+      { id: 'b1', order: 1, text: 'q', answer: 'a', quizRound: 5 },
+      { id: 'bonus', order: 99, text: 'q', answer: 'a', quizRound: 5, quizBonus: true },
+    ];
+    const scores = quizScores({
+      questions,
+      marks: { b1: { a: true }, bonus: { a: true } },
+      bets: null,
+      settings: QUIZ_DEFAULT_SETTINGS,
+      participants,
+    });
+    expect(scores.a).toBe(2 + QUIZ_DEFAULT_SETTINGS.bonusPoints);
+    expect(scores.b).toBe(0);
+  });
+
+  it('formats pairs for the host answer key', () => {
+    expect(quizPairsLabel([[0, 5], [1, 6]])).toBe('1–6, 2–7');
+    expect(quizPairsLabel(null)).toBe('');
   });
 });

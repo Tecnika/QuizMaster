@@ -13,6 +13,7 @@ import {
   generatePlayerToken,
   melodySettings,
   normalizeCode,
+  quizSettings,
   type Answer,
   type Game,
   type Participant,
@@ -94,6 +95,11 @@ export async function createSession(game: Game, hostId: string): Promise<string>
     melodyOut: null,
     melodySuper: null,
     melodyConfig: game.type === 'melody' ? melodySettings(game.settings) : null,
+    quizRound: null,
+    quizQuestionIndex: null,
+    quizMarks: null,
+    quizBets: null,
+    quizConfig: game.type === 'quiz' ? quizSettings(game.settings) : null,
   });
   await setDoc(doc(db, 'joinCodes', code), { sessionId: ref.id, hostId });
   return ref.id;

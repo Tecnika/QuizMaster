@@ -11,11 +11,13 @@ import {
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/auth';
 import { createSession } from '../lib/session';
-import { checkGameStart, countMelodyRounds } from '../lib/gameStart';
+import { checkGameStart, countMelodyRounds, countQuizRounds } from '../lib/gameStart';
 import MillionaireEditor from '../components/MillionaireEditor';
 import SvoyaEditor from '../components/SvoyaEditor';
 import MelodyEditor from '../components/MelodyEditor';
+import QuizEditor from '../components/QuizEditor';
 import type { Game, GameSettings, Question } from '@quizmaster/shared';
+import { quizSettings } from '@quizmaster/shared';
 
 export default function GameEditorPage() {
   const { gameId } = useParams();
@@ -96,7 +98,10 @@ export default function GameEditorPage() {
     setStarting(true);
     setError('');
     try {
-      const check = checkGameStart(game, questions.length, countMelodyRounds(questions));
+      const check = checkGameStart(game, questions.length, countMelodyRounds(questions), {
+        counts: countQuizRounds(questions, quizSettings(game.settings)),
+        settings: quizSettings(game.settings),
+      });
       if (check.blocking) {
         setError(check.message || 'В игре нет вопросов');
         return;
@@ -119,7 +124,7 @@ export default function GameEditorPage() {
         <div className="qm-page-head">
           <div>
             <div className="qm-eyebrow">
-              {game.type === 'millionaire' ? 'Миллионер' : game.type === 'melody' ? 'Угадай мелодию' : 'Своя игра'} · редактор
+              {game.type === 'millionaire' ? 'Миллионер' : game.type === 'melody' ? 'Угадай мелодию' : game.type === 'quiz' ? 'Классический квиз' : 'Своя игра'} · редактор
             </div>
             <h1 className="qm-title">{game.title}</h1>
             <p className="qm-subtitle">
@@ -127,7 +132,9 @@ export default function GameEditorPage() {
                 ? 'Заполните 15 вопросов лестницы.'
                 : game.type === 'melody'
                   ? 'Соберите мелодии: четыре тура и суперигра.'
-                  : 'Соберите табло: раунды, темы и стоимости.'}
+                  : game.type === 'quiz'
+                    ? 'Семь раундов и 51 вопрос: от разминки до казино.'
+                    : 'Соберите табло: раунды, темы и стоимости.'}
             </p>
           </div>
           <div className="qm-inline">
@@ -186,6 +193,13 @@ export default function GameEditorPage() {
         <MillionaireEditor gameId={game.id} questions={questions} />
       ) : game.type === 'melody' ? (
         <MelodyEditor
+          gameId={game.id}
+          questions={questions}
+          settings={game.settings || {}}
+          onUpdateSettings={updateSettings}
+        />
+      ) : game.type === 'quiz' ? (
+        <QuizEditor
           gameId={game.id}
           questions={questions}
           settings={game.settings || {}}

@@ -12,6 +12,7 @@ import {
 } from '@quizmaster/shared';
 import { IconCat, IconGavel } from '../components/icons';
 import MelodyScreen from '../components/MelodyScreen';
+import QuizScreen from '../components/QuizScreen';
 import { QuestionAudio, QuestionImage } from '../components/QuestionMedia';
 
 export default function ScreenPage() {
@@ -53,10 +54,11 @@ export default function ScreenPage() {
 
   const isMillionaire = session.gameType === 'millionaire';
   const isMelody = session.gameType === 'melody';
+  const isQuiz = session.gameType === 'quiz';
   const title = session.gameTitle || 'QuizMaster';
 
   return (
-    <div className={`tv ${isMillionaire ? 'tv-millionaire' : isMelody ? 'tv-melody' : 'tv-svoya'}`} role="main">
+    <div className={`tv ${isMillionaire ? 'tv-millionaire' : isMelody ? 'tv-melody' : isQuiz ? 'tv-quiz' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <span className="tv-logo">{title}</span>
@@ -88,6 +90,8 @@ export default function ScreenPage() {
         <MillionaireScreen session={session} participants={participants} />
       ) : isMelody ? (
         <MelodyScreen session={session} participants={participants} />
+      ) : isQuiz ? (
+        <QuizScreen session={session} participants={participants} />
       ) : (
         <SvoyaScreen session={session} participants={participants} />
       )}

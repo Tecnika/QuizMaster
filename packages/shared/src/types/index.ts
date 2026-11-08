@@ -1,10 +1,11 @@
-export type GameType = 'millionaire' | 'svoya' | 'melody';
+export type GameType = 'millionaire' | 'svoya' | 'melody' | 'quiz';
 export type GameStatus = 'draft' | 'ready' | 'archived';
 export type UserRole = 'author' | 'admin';
 
 export type SessionStatus = 'lobby' | 'active' | 'paused' | 'finished';
 export type QuestionKind = 'normal' | 'cat' | 'auction';
 export type MillionaireTurnStatus = 'answering' | 'revealed' | 'finished';
+export type QuizRoundType = 'choice' | 'text' | 'media' | 'blitz' | 'backstage' | 'pairs' | 'casino';
 
 export interface UserProfile {
   login: string;
@@ -35,6 +36,23 @@ export interface MelodySettings {
   superBonus: number;
 }
 
+export interface QuizRound {
+  name: string;
+  type: QuizRoundType;
+  /** Очки за один верный ответ. */
+  points: number;
+  /** Сколько вопросов в раунде (без общего вопроса «За кулисами»). */
+  count: number;
+}
+
+export interface QuizSettings {
+  rounds: QuizRound[];
+  /** Бонус за общий вопрос раунда «За кулисами». */
+  bonusPoints: number;
+  /** Лимит времени на вопрос по умолчанию. */
+  timePerQuestion: number;
+}
+
 export interface GameSettings {
   /** Лестница «Миллионера» (15 значений). */
   ladder?: number[];
@@ -50,6 +68,8 @@ export interface GameSettings {
   timeLimitSeconds?: number;
   /** Настройки «Угадай мелодию». */
   melody?: MelodySettings;
+  /** Настройки классического квиза. */
+  quiz?: QuizSettings;
 }
 
 export interface Game {
@@ -89,6 +109,13 @@ export interface Question {
   theme?: string;
   value?: number;
   kind?: QuestionKind;
+
+  /** Классический квиз */
+  quizRound?: number;
+  /** Общий вопрос раунда «За кулисами». */
+  quizBonus?: boolean;
+  /** Правильные пары для раунда «Папарам» (индексы options). */
+  pairs?: [number, number][];
 }
 
 /** Вопрос, который видят игроки: без правильного ответа. */
@@ -104,6 +131,8 @@ export interface PublicQuestion {
   theme?: string;
   value?: number;
   kind?: QuestionKind;
+  quizRound?: number;
+  quizBonus?: boolean;
 }
 
 export interface Participant {
@@ -192,6 +221,17 @@ export interface Session {
   melodySuper?: { startedAt: number; found: string[]; finished: boolean } | null;
   /** Снимок настроек «Угадай мелодию» для экрана и игроков. */
   melodyConfig?: MelodySettings | null;
+
+  /** Классический квиз: текущий раунд 1–7. */
+  quizRound?: number | null;
+  /** Номер открытого вопроса в раунде (для экрана и игроков). */
+  quizQuestionIndex?: number | null;
+  /** Отметки ведущего: questionId → participantId → верно/неверно. */
+  quizMarks?: Record<string, Record<string, boolean>> | null;
+  /** Ставки казино: questionId → participantId → ставка. */
+  quizBets?: Record<string, Record<string, number>> | null;
+  /** Снимок настроек квиза для экрана и игроков. */
+  quizConfig?: QuizSettings | null;
 
   finalStage?: {
     active: boolean;

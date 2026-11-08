@@ -16,6 +16,7 @@ import { useAuth } from '../lib/auth';
 import { useCountdown } from '../lib/useCountdown';
 import { IconCat, IconCheck, IconGavel } from '../components/icons';
 import MelodyHost from '../components/MelodyHost';
+import QuizHost from '../components/QuizHost';
 import { QuestionAudio, QuestionImage } from '../components/QuestionMedia';
 import {
   MILLIONAIRE_LADDER,
@@ -199,6 +200,14 @@ export default function SessionHostPage() {
         patch.melodyPrize = null;
         patch.melodyPrizeStartedAt = null;
         patch.melodyBids = null;
+        patch.activeCellId = null;
+        patch.publicQuestion = null;
+      }
+      if (session.gameType === 'quiz') {
+        patch.quizRound = 1;
+        patch.quizQuestionIndex = null;
+        patch.quizMarks = {};
+        patch.quizBets = {};
         patch.activeCellId = null;
         patch.publicQuestion = null;
       }
@@ -473,7 +482,7 @@ export default function SessionHostPage() {
   };
 
   return (
-    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : session.gameType === 'melody' ? 'tv-melody' : 'tv-svoya'}`} role="main">
+    <div className={`tv ${session.gameType === 'millionaire' ? 'tv-millionaire' : session.gameType === 'melody' ? 'tv-melody' : session.gameType === 'quiz' ? 'tv-quiz' : 'tv-svoya'}`} role="main">
       <div className="tv-top">
         <div className="qm-inline">
           <Link to="/cabinet" className="tv-icon-btn">← Кабинет</Link>
@@ -887,6 +896,22 @@ export default function SessionHostPage() {
           answers={answers}
           onPatch={patchSession}
           onFinish={finishGame}
+        />
+      )}
+
+      {session.status === 'active' && session.gameType === 'quiz' && sessionId && game && (
+        <QuizHost
+          session={session}
+          sessionId={sessionId}
+          game={game}
+          participants={participants}
+          questions={questions}
+          onPatch={patchSession}
+          onFinish={finishGame}
+          timerLimit={timerLimit}
+          timeLeft={timeLeft}
+          startTimer={startTimer}
+          stopTimer={stopTimer}
         />
       )}
 

@@ -7,7 +7,7 @@ export default function RulesPage() {
         <div>
           <div className="qm-eyebrow">Свод правил</div>
           <h1 className="qm-title">Как играть</h1>
-          <p className="qm-subtitle">Кратко о трёх форматах и о том, как работает сессия.</p>
+          <p className="qm-subtitle">Кратко о четырёх форматах и о том, как работает сессия.</p>
         </div>
         <Link className="qm-btn qm-btn-ghost" to="/join">Присоединиться</Link>
       </div>
@@ -63,6 +63,29 @@ export default function RulesPage() {
           <b>Суперигра</b> — семь мелодий за 30 секунд. Все семь — бонус к призу.
         </p>
         <p className="qm-small">Источник: <a className="qm-link" href="https://ugadaj-melodiyu.narod.ru/" target="_blank" rel="noreferrer">ugadaj-melodiyu.narod.ru</a></p>
+      </section>
+
+      <section className="qm-card" id="quiz">
+        <div className="qm-eyebrow">Формат 4</div>
+        <h2 className="qm-title">Классический квиз</h2>
+        <p>Командная игра в формате паб-квиза: ведущий читает вопросы, команды обсуждают и сдают ответы на бланках.</p>
+        <div className="qm-grid qm-grid-4 qm-mt">
+          <div className="qm-stat"><b>7</b><span>раундов</span></div>
+          <div className="qm-stat"><b>51</b><span>вопрос</span></div>
+          <div className="qm-stat"><b>2–8</b><span>человек в команде</span></div>
+          <div className="qm-stat"><b>~2 ч</b><span>длится игра</span></div>
+        </div>
+        <h3 className="qm-mt">Раунды</h3>
+        <p className="qm-small">
+          <b>Разминка</b> — 7 вопросов с четырьмя вариантами.<br />
+          <b>Бинго</b> — 3 темы по 3 письменных вопроса.<br />
+          <b>Пошумим</b> — 7 аудио- и медиавопросов.<br />
+          <b>Секундочку</b> — блиц из 12 коротких вопросов.<br />
+          <b>За кулисами</b> — 5 заданий и общий вопрос с бонусом.<br />
+          <b>Папарам</b> — 4 задачи: из 10 элементов составить 5 пар.<br />
+          <b>Казино</b> — 6 вопросов на логику со ставками: верно — плюс ставка, неверно — минус.
+        </p>
+        <p className="qm-small">Источник: <a className="qm-link" href="https://squiz.ru/pravila-kviza" target="_blank" rel="noreferrer">squiz.ru/pravila-kviza</a></p>
       </section>
 
       <section className="qm-card">

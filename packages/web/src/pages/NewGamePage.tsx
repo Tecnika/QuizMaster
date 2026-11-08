@@ -7,10 +7,11 @@ import {
   MELODY_DEFAULT_SETTINGS,
   MILLIONAIRE_LADDER,
   MILLIONAIRE_SAFE_HAVENS,
+  QUIZ_DEFAULT_SETTINGS,
   SVOYA_DEFAULT_ROUNDS,
   type GameType,
 } from '@quizmaster/shared';
-import { IconBrain, IconCoins, IconMusic } from '../components/icons';
+import { IconBrain, IconCoins, IconMusic, IconUsers } from '../components/icons';
 
 export default function NewGamePage() {
   const navigate = useNavigate();
@@ -36,7 +37,9 @@ export default function NewGamePage() {
         ? { ladder: MILLIONAIRE_LADDER, safeHavens: MILLIONAIRE_SAFE_HAVENS, timeLimitSeconds: 60 }
         : type === 'melody'
           ? { melody: MELODY_DEFAULT_SETTINGS, timeLimitSeconds: 0 }
-          : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false, timeLimitSeconds: 60 };
+          : type === 'quiz'
+            ? { quiz: QUIZ_DEFAULT_SETTINGS, timeLimitSeconds: QUIZ_DEFAULT_SETTINGS.timePerQuestion }
+            : { rounds: SVOYA_DEFAULT_ROUNDS, allowSpecial: true, finalRound: false, timeLimitSeconds: 60 };
       const ref = await addDoc(collection(db, 'games'), {
         title: title.trim(),
         description: description.trim(),
@@ -111,6 +114,16 @@ export default function NewGamePage() {
               <div className="icon"><IconMusic size={32} /></div>
               <h2>Угадай мелодию</h2>
               <p>Четыре тура, растущий приз, торги с нот и суперигра. Нужны аудиофрагменты.</p>
+            </button>
+            <button
+              type="button"
+              className="qm-card qm-feature"
+              onClick={() => setType('quiz')}
+              style={{ textAlign: 'left', cursor: 'pointer', borderColor: type === 'quiz' ? 'var(--green)' : undefined, boxShadow: type === 'quiz' ? '0 0 0 3px rgba(31,77,58,.2)' : undefined }}
+            >
+              <div className="icon"><IconUsers size={32} /></div>
+              <h2>Классический квиз</h2>
+              <p>7 раундов и 51 вопрос: разминка, бинго, медиа, блиц, пары и казино. Команды сдают бланки.</p>
             </button>
           </div>
 

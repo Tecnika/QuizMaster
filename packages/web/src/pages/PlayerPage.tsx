@@ -9,6 +9,7 @@ import {
 import { useCountdown } from '../lib/useCountdown';
 import { IconCheck, IconCross } from '../components/icons';
 import MelodyPlayer from '../components/MelodyPlayer';
+import QuizPlayer from '../components/QuizPlayer';
 import { QuestionImage } from '../components/QuestionMedia';
 import { formatCountdown, type Participant, type Session } from '@quizmaster/shared';
 
@@ -65,6 +66,7 @@ export default function PlayerPage() {
 
   const isMillionaire = session.gameType === 'millionaire';
   const isMelody = session.gameType === 'melody';
+  const isQuiz = session.gameType === 'quiz';
   const turn = session.turn;
   const myTurn = isMillionaire && turn?.participantId === me.id;
   const question = session.publicQuestion;
@@ -108,7 +110,7 @@ export default function PlayerPage() {
       <div className="player-head">
         <div className="qm-inline" style={{ justifyContent: 'space-between' }}>
           <span className="tv-logo" style={{ color: '#ffd447' }}>
-            {isMillionaire ? 'Миллионер' : isMelody ? 'Угадай мелодию' : 'Своя игра'}
+            {isMillionaire ? 'Миллионер' : isMelody ? 'Угадай мелодию' : isQuiz ? 'Классический квиз' : 'Своя игра'}
           </span>
           <span className="player-code">{session.code}</span>
         </div>
@@ -225,7 +227,11 @@ export default function PlayerPage() {
         />
       )}
 
-      {session.status === 'active' && !isMillionaire && !isMelody && (
+      {session.status === 'active' && isQuiz && (
+        <QuizPlayer session={session} me={me} />
+      )}
+
+      {session.status === 'active' && !isMillionaire && !isMelody && !isQuiz && (
         <div>
           {!question && (
             <div className="player-status">Ведущий выбирает вопрос на табло.</div>

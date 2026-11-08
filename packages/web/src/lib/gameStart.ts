@@ -1,4 +1,5 @@
-import type { Game, Question } from '@quizmaster/shared';
+import type { Game, Question, QuizSettings } from '@quizmaster/shared';
+import { quizRoundSlots } from '@quizmaster/shared';
 
 export interface GameStartCheck {
   blocking: boolean;
@@ -12,6 +13,15 @@ export interface MelodyCounts {
   super: number;
 }
 
+/** Считает заполненные вопросы квиза по раундам. */
+export function countQuizRounds(questions: Question[], settings: QuizSettings): Record<number, number> {
+  const out: Record<number, number> = {};
+  for (let round = 1; round <= settings.rounds.length; round++) {
+    out[round] = questions.filter((q) => q.quizRound === round && q.answer).length;
+  }
+  return out;
+}
+
 /** Считает заполненные мелодии по турам. */
 export function countMelodyRounds(questions: Question[]): MelodyCounts {
   const byRound = (round: number) => questions.filter(
@@ -21,9 +31,36 @@ export function countMelodyRounds(questions: Question[]): MelodyCounts {
 }
 
 /** Проверка перед созданием сессии: пустая игра блокируется, неполная — предупреждает. */
-export function checkGameStart(game: Game, questionCount: number, melody?: MelodyCounts): GameStartCheck {
+export function checkGameStart(
+  game: Game,
+  questionCount: number,
+  melody?: MelodyCounts,
+  quiz?: { counts: Record<number, number>; settings: QuizSettings },
+): GameStartCheck {
   if (questionCount === 0) {
     return { blocking: true, message: 'В игре нет вопросов. Добавьте хотя бы один вопрос.' };
+  }
+
+  if (game.type === 'quiz') {
+    if (!quiz) {
+      return { blocking: false, message: null };
+    }
+    if (questionCount === 0) {
+      return { blocking: true, message: 'В квизе нет ни одного вопроса.' };
+    }
+    const parts: string[] = [];
+    if (game.status !== 'ready') parts.push('Игра ещё в черновике.');
+    quiz.settings.rounds.forEach((round, i) => {
+      const expected = quizRoundSlots(round);
+      const actual = quiz.counts[i + 1] ?? 0;
+      if (actual < expected) {
+        parts.push(`${round.name}: ${actual} из ${expected}.`);
+      }
+    });
+    return {
+      blocking: false,
+      message: parts.length ? `${parts.join(' ')} Запустить сессию?` : null,
+    };
   }
 
   if (game.type === 'melody') {
