@@ -244,6 +244,7 @@ export default function PlayerPage() {
           session={session}
           me={me}
           onSubmit={submitQuiz}
+          expired={expired}
         />
       )}
 

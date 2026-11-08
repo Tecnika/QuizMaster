@@ -15,10 +15,12 @@ export default function QuizPlayer({
   session,
   me,
   onSubmit,
+  expired,
 }: {
   session: Session;
   me: Participant;
   onSubmit: (payload: Payload) => Promise<void>;
+  expired: boolean;
 }) {
   const settings = session.quizConfig ?? quizSettings(null);
   const roundNo = session.quizRound ?? 1;
@@ -74,6 +76,7 @@ export default function QuizPlayer({
 
   const submit = async () => {
     setError('');
+    if (expired) return setError('Время вышло');
     let payload: Payload;
     if (isChoice) {
       if (selected === null) return setError('Выберите вариант');
@@ -133,9 +136,13 @@ export default function QuizPlayer({
         <div className="player-quiz-sent">
           <div className="qm-small">Ответ отправлен ведущему</div>
           <div className="player-quiz-sent-value">{submittedLabel}</div>
-          <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => setSubmitted(null)}>
-            Изменить ответ
-          </button>
+          {expired ? (
+            <div className="qm-small">Время вышло</div>
+          ) : (
+            <button className="qm-btn qm-btn-ghost qm-btn-sm" onClick={() => setSubmitted(null)}>
+              Изменить ответ
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -195,10 +202,10 @@ export default function QuizPlayer({
           {error && <div className="player-toast">{error}</div>}
           <button
             className="qm-btn qm-btn-gold qm-btn-block qm-btn-lg qm-mt"
-            disabled={saving}
+            disabled={saving || expired}
             onClick={() => void submit()}
           >
-            {saving ? 'Отправляем…' : 'Отправить ответ'}
+            {expired ? 'Время вышло' : saving ? 'Отправляем…' : 'Отправить ответ'}
           </button>
           <div className="player-quiz-note">Ответ можно изменить до показа результата.</div>
         </>
